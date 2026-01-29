@@ -1,18 +1,18 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Modal } from 'react-native';
-import { Calendar, DateData } from 'react-native-calendars';
-import { useRouter } from 'expo-router';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { useRouter } from "expo-router";
+import React, { useState } from "react";
+import { Modal, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Calendar, DateData } from "react-native-calendars";
+import { SafeAreaView } from "react-native-safe-area-context";
 
-import { useApp } from '@/context/AppContext';
-import { Routine, RoutineCategory } from '@/types';
-import { Colors, Spacing, Typography } from '@/constants/theme';
-import { IconSymbol } from '@/components/ui/icon-symbol';
+import { IconSymbol } from "@/components/ui/icon-symbol";
+import { Colors, Spacing, Typography } from "@/constants/theme";
+import { useApp } from "@/context/AppContext";
+import { Routine } from "@/types";
 
 export default function CalendarScreen() {
   const router = useRouter();
   const { routines, logs, deleteRoutine } = useApp();
-  const [selectedDate, setSelectedDate] = useState<string>('');
+  const [selectedDate, setSelectedDate] = useState<string>("");
   const [selectedLogs, setSelectedLogs] = useState<any[]>([]);
   const [modalVisible, setModalVisible] = useState(false);
 
@@ -44,7 +44,7 @@ export default function CalendarScreen() {
 
   const handleDayPress = (day: DateData) => {
     const dateLogs = logs.filter(
-      (log) => log.date === day.dateString && log.completed
+      (log) => log.date === day.dateString && log.completed,
     );
     setSelectedDate(day.dateString);
     setSelectedLogs(dateLogs);
@@ -53,11 +53,11 @@ export default function CalendarScreen() {
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
-    return date.toLocaleDateString('es-ES', {
-      weekday: 'long',
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
+    return date.toLocaleDateString("es-ES", {
+      weekday: "long",
+      year: "numeric",
+      month: "long",
+      day: "numeric",
     });
   };
 
@@ -78,59 +78,80 @@ export default function CalendarScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
+    <SafeAreaView style={styles.container} edges={["top"]}>
       <View style={styles.header}>
         <Text style={styles.title}>Calendario</Text>
         <Text style={styles.subtitle}>Visualiza tu progreso</Text>
       </View>
 
-      <Calendar
-        onDayPress={handleDayPress}
-        markedDates={markedDates}
-        markingType="multi-dot"
-        theme={{
-          backgroundColor: Colors.background,
-          calendarBackground: Colors.background,
-          textSectionTitleColor: Colors.text,
-          selectedDayBackgroundColor: Colors.muscle.Legs,
-          selectedDayTextColor: Colors.background,
-          todayTextColor: Colors.muscle.Legs,
-          dayTextColor: Colors.text,
-          textDisabledColor: Colors.gray.medium,
-          dotColor: Colors.muscle.Legs,
-          selectedDotColor: Colors.background,
-          arrowColor: Colors.muscle.Legs,
-          monthTextColor: Colors.text,
-          textDayFontWeight: '500',
-          textMonthFontWeight: '600',
-          textDayHeaderFontWeight: '600',
-          textDayFontSize: 16,
-          textMonthFontSize: 18,
-          textDayHeaderFontSize: 14,
-        }}
-        style={styles.calendar}
-      />
+      <View style={styles.calendarContainer}>
+        <Calendar
+          onDayPress={handleDayPress}
+          markedDates={markedDates}
+          markingType="multi-dot"
+          theme={{
+            backgroundColor: Colors.backgroundCard,
+            calendarBackground: Colors.backgroundCard,
+            textSectionTitleColor: Colors.textSecondary,
+            selectedDayBackgroundColor: Colors.primary,
+            selectedDayTextColor: Colors.text,
+            todayTextColor: Colors.primary,
+            dayTextColor: Colors.text,
+            textDisabledColor: Colors.textMuted,
+            dotColor: Colors.primary,
+            selectedDotColor: Colors.text,
+            arrowColor: Colors.primary,
+            monthTextColor: Colors.text,
+            textDayFontWeight: "500",
+            textMonthFontWeight: "600",
+            textDayHeaderFontWeight: "600",
+            textDayFontSize: 16,
+            textMonthFontSize: 18,
+            textDayHeaderFontSize: 14,
+          }}
+          style={styles.calendar}
+        />
+      </View>
+
+      {/* Legend */}
+      <View style={styles.legendContainer}>
+        <Text style={styles.legendTitle}>Categorías</Text>
+        <View style={styles.legendItems}>
+          {Object.entries(Colors.muscle).map(([category, color]) => (
+            <View key={category} style={styles.legendItem}>
+              <View style={[styles.legendDot, { backgroundColor: color }]} />
+              <Text style={styles.legendText}>{category}</Text>
+            </View>
+          ))}
+        </View>
+      </View>
 
       <Modal
         visible={modalVisible}
         transparent
         animationType="slide"
-        onRequestClose={() => setModalVisible(false)}>
+        onRequestClose={() => setModalVisible(false)}
+      >
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
             <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>
-                {formatDate(selectedDate)}
-              </Text>
+              <Text style={styles.modalTitle}>{formatDate(selectedDate)}</Text>
               <TouchableOpacity
+                style={styles.closeButton}
                 onPress={() => setModalVisible(false)}
-                hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
-                <IconSymbol name="xmark" size={24} color={Colors.gray.dark} />
+                hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+              >
+                <IconSymbol
+                  name="xmark"
+                  size={20}
+                  color={Colors.textSecondary}
+                />
               </TouchableOpacity>
             </View>
 
             {selectedLogs.length === 0 ? (
               <View style={styles.emptyModalContent}>
+                <Text style={styles.emptyModalIcon}>📅</Text>
                 <Text style={styles.emptyModalText}>
                   No hay entrenamientos registrados para este día
                 </Text>
@@ -145,7 +166,9 @@ export default function CalendarScreen() {
                     <TouchableOpacity
                       key={log.id}
                       style={styles.logItem}
-                      onPress={() => handleViewRoutine(routine)}>
+                      activeOpacity={0.8}
+                      onPress={() => handleViewRoutine(routine)}
+                    >
                       <View
                         style={[
                           styles.logCategoryIndicator,
@@ -154,10 +177,26 @@ export default function CalendarScreen() {
                       />
                       <View style={styles.logItemContent}>
                         <Text style={styles.logItemName}>{routine.name}</Text>
-                        <Text style={styles.logItemCategory}>
-                          {routine.category}
-                        </Text>
+                        <View style={styles.logItemMeta}>
+                          <View
+                            style={[
+                              styles.logCategoryDot,
+                              {
+                                backgroundColor:
+                                  Colors.muscle[routine.category],
+                              },
+                            ]}
+                          />
+                          <Text style={styles.logItemCategory}>
+                            {routine.category}
+                          </Text>
+                        </View>
                       </View>
+                      <IconSymbol
+                        name="chevron.right"
+                        size={16}
+                        color={Colors.textMuted}
+                      />
                     </TouchableOpacity>
                   );
                 })}
@@ -177,6 +216,7 @@ const styles = StyleSheet.create({
   },
   header: {
     padding: Spacing.lg,
+    paddingTop: Spacing.xl,
     paddingBottom: Spacing.md,
   },
   title: {
@@ -186,48 +226,97 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     ...Typography.caption,
-    color: Colors.gray.dark,
+    color: Colors.textSecondary,
+  },
+  calendarContainer: {
+    marginHorizontal: Spacing.lg,
+    borderRadius: Colors.ui.borderRadiusLarge,
+    overflow: "hidden",
+    borderWidth: 1,
+    borderColor: Colors.border,
   },
   calendar: {
+    backgroundColor: Colors.backgroundCard,
+  },
+  legendContainer: {
     marginHorizontal: Spacing.lg,
+    marginTop: Spacing.lg,
+    padding: Spacing.md,
+    backgroundColor: Colors.backgroundCard,
     borderRadius: Colors.ui.borderRadius,
-    ...Colors.ui.shadow,
+    borderWidth: 1,
+    borderColor: Colors.border,
+  },
+  legendTitle: {
+    ...Typography.captionMedium,
+    color: Colors.textMuted,
+    marginBottom: Spacing.sm,
+  },
+  legendItems: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: Spacing.md,
+  },
+  legendItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: Spacing.xs,
+  },
+  legendDot: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+  },
+  legendText: {
+    ...Typography.caption,
+    color: Colors.textSecondary,
   },
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    justifyContent: 'flex-end',
+    backgroundColor: "rgba(0, 0, 0, 0.7)",
+    justifyContent: "flex-end",
   },
   modalContent: {
-    backgroundColor: Colors.background,
-    borderTopLeftRadius: Colors.ui.borderRadiusLarge,
-    borderTopRightRadius: Colors.ui.borderRadiusLarge,
+    backgroundColor: Colors.backgroundCard,
+    borderTopLeftRadius: Colors.ui.borderRadiusXL,
+    borderTopRightRadius: Colors.ui.borderRadiusXL,
     padding: Spacing.lg,
-    maxHeight: '70%',
+    maxHeight: "70%",
   },
   modalHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     marginBottom: Spacing.md,
     paddingBottom: Spacing.md,
     borderBottomWidth: 1,
-    borderBottomColor: Colors.gray.light,
+    borderBottomColor: Colors.border,
   },
   modalTitle: {
-    ...Typography.h2,
+    ...Typography.h3,
     color: Colors.text,
-    textTransform: 'capitalize',
+    textTransform: "capitalize",
+    flex: 1,
+  },
+  closeButton: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: Colors.backgroundElevated,
+    justifyContent: "center",
+    alignItems: "center",
   },
   modalBody: {
-    gap: Spacing.md,
+    gap: Spacing.sm,
   },
   logItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: Colors.gray.light,
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: Colors.backgroundElevated,
     borderRadius: Colors.ui.borderRadius,
     padding: Spacing.md,
+    borderWidth: 1,
+    borderColor: Colors.border,
   },
   logCategoryIndicator: {
     width: 4,
@@ -239,23 +328,35 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   logItemName: {
-    ...Typography.body,
+    ...Typography.bodyMedium,
     color: Colors.text,
-    fontWeight: '600',
     marginBottom: Spacing.xs,
+  },
+  logItemMeta: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: Spacing.xs,
+  },
+  logCategoryDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
   },
   logItemCategory: {
     ...Typography.caption,
-    color: Colors.gray.dark,
+    color: Colors.textSecondary,
   },
   emptyModalContent: {
     padding: Spacing.xl,
-    alignItems: 'center',
+    alignItems: "center",
+  },
+  emptyModalIcon: {
+    fontSize: 48,
+    marginBottom: Spacing.md,
   },
   emptyModalText: {
     ...Typography.body,
-    color: Colors.gray.dark,
-    textAlign: 'center',
+    color: Colors.textSecondary,
+    textAlign: "center",
   },
 });
-

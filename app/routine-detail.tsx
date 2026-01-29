@@ -1,17 +1,18 @@
-import React from 'react';
+import { LinearGradient } from "expo-linear-gradient";
+import { useLocalSearchParams, useRouter } from "expo-router";
+import React from "react";
 import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  TouchableOpacity,
-} from 'react-native';
-import { useRouter, useLocalSearchParams } from 'expo-router';
-import { SafeAreaView } from 'react-native-safe-area-context';
+    ScrollView,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View,
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
-import { useApp } from '@/context/AppContext';
-import { Colors, Spacing, Typography } from '@/constants/theme';
-import { IconSymbol } from '@/components/ui/icon-symbol';
+import { IconSymbol } from "@/components/ui/icon-symbol";
+import { Colors, Spacing, Typography } from "@/constants/theme";
+import { useApp } from "@/context/AppContext";
 
 export default function RoutineDetailScreen() {
   const router = useRouter();
@@ -24,10 +25,14 @@ export default function RoutineDetailScreen() {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.notFoundContainer}>
+          <View style={styles.notFoundIcon}>
+            <Text style={styles.notFoundEmoji}>🔍</Text>
+          </View>
           <Text style={styles.notFoundText}>Rutina no encontrada</Text>
           <TouchableOpacity
             style={styles.backButton}
-            onPress={() => router.back()}>
+            onPress={() => router.back()}
+          >
             <Text style={styles.backButtonText}>Volver</Text>
           </TouchableOpacity>
         </View>
@@ -38,17 +43,21 @@ export default function RoutineDetailScreen() {
   const categoryColor = Colors.muscle[routine.category];
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
+    <SafeAreaView style={styles.container} edges={["top"]}>
       <View style={styles.header}>
         <TouchableOpacity
           style={styles.closeButton}
           onPress={() => router.back()}
-          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
-          <IconSymbol name="xmark" size={24} color={Colors.text} />
+          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+        >
+          <IconSymbol name="xmark" size={20} color={Colors.textSecondary} />
         </TouchableOpacity>
       </View>
 
-      <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        style={styles.scrollView}
+        showsVerticalScrollIndicator={false}
+      >
         <View style={styles.content}>
           <View style={styles.titleSection}>
             <View
@@ -59,7 +68,29 @@ export default function RoutineDetailScreen() {
             />
             <View style={styles.titleContainer}>
               <Text style={styles.title}>{routine.name}</Text>
-              <Text style={styles.category}>{routine.category}</Text>
+              <View style={styles.categoryBadge}>
+                <View
+                  style={[
+                    styles.categoryDot,
+                    { backgroundColor: categoryColor },
+                  ]}
+                />
+                <Text style={styles.category}>{routine.category}</Text>
+              </View>
+            </View>
+          </View>
+
+          <View style={styles.statsRow}>
+            <View style={styles.statItem}>
+              <Text style={styles.statNumber}>{routine.exercises.length}</Text>
+              <Text style={styles.statLabel}>Ejercicios</Text>
+            </View>
+            <View style={styles.statDivider} />
+            <View style={styles.statItem}>
+              <Text style={styles.statNumber}>
+                {routine.exercises.reduce((acc, e) => acc + e.sets, 0)}
+              </Text>
+              <Text style={styles.statLabel}>Series Total</Text>
             </View>
           </View>
 
@@ -67,23 +98,47 @@ export default function RoutineDetailScreen() {
             <Text style={styles.sectionTitle}>Ejercicios</Text>
             {routine.exercises.length === 0 ? (
               <View style={styles.emptyExercises}>
-                <Text style={styles.emptyText}>No hay ejercicios en esta rutina</Text>
+                <Text style={styles.emptyIcon}>📝</Text>
+                <Text style={styles.emptyText}>
+                  No hay ejercicios en esta rutina
+                </Text>
               </View>
             ) : (
               <View style={styles.exercisesList}>
                 {routine.exercises.map((exercise, index) => (
                   <View key={exercise.id} style={styles.exerciseCard}>
                     <View style={styles.exerciseHeader}>
-                      <Text style={styles.exerciseNumber}>{index + 1}</Text>
+                      <View
+                        style={[
+                          styles.exerciseNumber,
+                          { backgroundColor: categoryColor + "20" },
+                        ]}
+                      >
+                        <Text
+                          style={[
+                            styles.exerciseNumberText,
+                            { color: categoryColor },
+                          ]}
+                        >
+                          {index + 1}
+                        </Text>
+                      </View>
                       <Text style={styles.exerciseName}>{exercise.name}</Text>
                     </View>
                     <View style={styles.exerciseDetails}>
-                      <Text style={styles.exerciseDetail}>
-                        {exercise.sets} series
-                      </Text>
-                      <Text style={styles.exerciseDetail}>
-                        {exercise.reps} repeticiones
-                      </Text>
+                      <View style={styles.exerciseDetailItem}>
+                        <Text style={styles.exerciseDetailValue}>
+                          {exercise.sets}
+                        </Text>
+                        <Text style={styles.exerciseDetailLabel}>series</Text>
+                      </View>
+                      <Text style={styles.exerciseDetailDivider}>×</Text>
+                      <View style={styles.exerciseDetailItem}>
+                        <Text style={styles.exerciseDetailValue}>
+                          {exercise.reps}
+                        </Text>
+                        <Text style={styles.exerciseDetailLabel}>reps</Text>
+                      </View>
                     </View>
                   </View>
                 ))}
@@ -92,10 +147,19 @@ export default function RoutineDetailScreen() {
           </View>
 
           <TouchableOpacity
-            style={[styles.editButton, { backgroundColor: categoryColor }]}
-            onPress={() => router.push(`/routine-edit?id=${routine.id}`)}>
-            <IconSymbol name="pencil" size={20} color={Colors.background} />
-            <Text style={styles.editButtonText}>Editar rutina</Text>
+            style={styles.editButton}
+            activeOpacity={0.85}
+            onPress={() => router.push(`/routine-edit?id=${routine.id}`)}
+          >
+            <LinearGradient
+              colors={[categoryColor, categoryColor + "CC"]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+              style={styles.editButtonGradient}
+            >
+              <IconSymbol name="pencil" size={18} color="#FFFFFF" />
+              <Text style={styles.editButtonText}>Editar rutina</Text>
+            </LinearGradient>
           </TouchableOpacity>
         </View>
       </ScrollView>
@@ -110,10 +174,17 @@ const styles = StyleSheet.create({
   },
   header: {
     padding: Spacing.md,
-    alignItems: 'flex-end',
+    alignItems: "flex-end",
   },
   closeButton: {
-    padding: Spacing.xs,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: Colors.backgroundCard,
+    justifyContent: "center",
+    alignItems: "center",
+    borderWidth: 1,
+    borderColor: Colors.border,
   },
   scrollView: {
     flex: 1,
@@ -122,8 +193,8 @@ const styles = StyleSheet.create({
     padding: Spacing.lg,
   },
   titleSection: {
-    flexDirection: 'row',
-    marginBottom: Spacing.xl,
+    flexDirection: "row",
+    marginBottom: Spacing.lg,
   },
   categoryIndicator: {
     width: 4,
@@ -139,80 +210,164 @@ const styles = StyleSheet.create({
     color: Colors.text,
     marginBottom: Spacing.xs,
   },
+  categoryBadge: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: Spacing.xs,
+  },
+  categoryDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+  },
   category: {
     ...Typography.body,
-    color: Colors.gray.dark,
-    fontWeight: '500',
+    color: Colors.textSecondary,
+  },
+  statsRow: {
+    flexDirection: "row",
+    backgroundColor: Colors.backgroundCard,
+    borderRadius: Colors.ui.borderRadius,
+    padding: Spacing.md,
+    marginBottom: Spacing.xl,
+    borderWidth: 1,
+    borderColor: Colors.border,
+  },
+  statItem: {
+    flex: 1,
+    alignItems: "center",
+  },
+  statNumber: {
+    ...Typography.h1,
+    color: Colors.primary,
+  },
+  statLabel: {
+    ...Typography.caption,
+    color: Colors.textSecondary,
+    marginTop: Spacing.xs,
+  },
+  statDivider: {
+    width: 1,
+    backgroundColor: Colors.border,
+    marginHorizontal: Spacing.md,
   },
   section: {
     marginBottom: Spacing.xl,
   },
   sectionTitle: {
-    ...Typography.h2,
-    color: Colors.text,
+    ...Typography.captionMedium,
+    color: Colors.textMuted,
+    textTransform: "uppercase",
+    letterSpacing: 1,
     marginBottom: Spacing.md,
   },
   exercisesList: {
-    gap: Spacing.md,
+    gap: Spacing.sm,
   },
   exerciseCard: {
-    backgroundColor: Colors.gray.light,
+    backgroundColor: Colors.backgroundCard,
     borderRadius: Colors.ui.borderRadius,
     padding: Spacing.md,
+    borderWidth: 1,
+    borderColor: Colors.border,
   },
   exerciseHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     marginBottom: Spacing.sm,
   },
   exerciseNumber: {
-    ...Typography.h3,
-    color: Colors.muscle.Legs,
-    marginRight: Spacing.md,
     width: 32,
+    height: 32,
+    borderRadius: 16,
+    justifyContent: "center",
+    alignItems: "center",
+    marginRight: Spacing.md,
+  },
+  exerciseNumberText: {
+    ...Typography.bodyMedium,
+    fontWeight: "600",
   },
   exerciseName: {
-    ...Typography.body,
+    ...Typography.bodyMedium,
     color: Colors.text,
-    fontWeight: '600',
     flex: 1,
   },
   exerciseDetails: {
-    flexDirection: 'row',
-    gap: Spacing.md,
-    paddingLeft: 40,
+    flexDirection: "row",
+    alignItems: "center",
+    paddingLeft: 48,
+    gap: Spacing.sm,
   },
-  exerciseDetail: {
+  exerciseDetailItem: {
+    flexDirection: "row",
+    alignItems: "baseline",
+    gap: Spacing.xs,
+  },
+  exerciseDetailValue: {
+    ...Typography.h3,
+    color: Colors.text,
+  },
+  exerciseDetailLabel: {
     ...Typography.caption,
-    color: Colors.gray.dark,
+    color: Colors.textMuted,
+  },
+  exerciseDetailDivider: {
+    ...Typography.body,
+    color: Colors.textMuted,
   },
   emptyExercises: {
     padding: Spacing.xl,
-    alignItems: 'center',
+    alignItems: "center",
+    backgroundColor: Colors.backgroundCard,
+    borderRadius: Colors.ui.borderRadius,
+    borderWidth: 1,
+    borderColor: Colors.border,
+  },
+  emptyIcon: {
+    fontSize: 48,
+    marginBottom: Spacing.md,
   },
   emptyText: {
     ...Typography.body,
-    color: Colors.gray.dark,
+    color: Colors.textSecondary,
   },
   editButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: Spacing.md,
     borderRadius: Colors.ui.borderRadius,
-    gap: Spacing.sm,
+    overflow: "hidden",
     ...Colors.ui.shadow,
+  },
+  editButtonGradient: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: Spacing.md,
+    gap: Spacing.sm,
   },
   editButtonText: {
     ...Typography.h3,
-    color: Colors.background,
-    fontWeight: '600',
+    color: "#FFFFFF",
+    fontWeight: "600",
   },
   notFoundContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     padding: Spacing.xl,
+  },
+  notFoundIcon: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: Colors.backgroundCard,
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: Spacing.lg,
+    borderWidth: 1,
+    borderColor: Colors.border,
+  },
+  notFoundEmoji: {
+    fontSize: 40,
   },
   notFoundText: {
     ...Typography.h2,
@@ -220,15 +375,13 @@ const styles = StyleSheet.create({
     marginBottom: Spacing.lg,
   },
   backButton: {
-    backgroundColor: Colors.muscle.Legs,
+    backgroundColor: Colors.primary,
     paddingHorizontal: Spacing.lg,
     paddingVertical: Spacing.md,
     borderRadius: Colors.ui.borderRadius,
   },
   backButtonText: {
-    ...Typography.body,
-    color: Colors.background,
-    fontWeight: '600',
+    ...Typography.bodyMedium,
+    color: "#FFFFFF",
   },
 });
-

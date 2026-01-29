@@ -1,28 +1,29 @@
-import React from 'react';
+import { LinearGradient } from "expo-linear-gradient";
+import { useRouter } from "expo-router";
+import React from "react";
 import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  TouchableOpacity,
-  Dimensions,
-} from 'react-native';
-import { useRouter } from 'expo-router';
-import { SafeAreaView } from 'react-native-safe-area-context';
+    Dimensions,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View,
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
-import { useApp } from '@/context/AppContext';
-import { Colors, Spacing, Typography } from '@/constants/theme';
+import { Colors, Spacing, Typography } from "@/constants/theme";
+import { useApp } from "@/context/AppContext";
 
-const { width } = Dimensions.get('window');
+const { width } = Dimensions.get("window");
 
 export default function HomeScreen() {
   const router = useRouter();
   const { user, routines, logs } = useApp();
 
-  const today = new Date().toISOString().split('T')[0];
+  const today = new Date().toISOString().split("T")[0];
   const todayLogs = logs.filter((log) => log.date === today && log.completed);
   const todayRoutine = routines.find((r) =>
-    todayLogs.some((log) => log.routineId === r.id)
+    todayLogs.some((log) => log.routineId === r.id),
   );
 
   // Calculate weekly progress (last 7 days)
@@ -32,25 +33,28 @@ export default function HomeScreen() {
     (log) =>
       log.completed &&
       new Date(log.date) >= sevenDaysAgo &&
-      new Date(log.date) <= new Date()
+      new Date(log.date) <= new Date(),
   );
   const weeklyProgress = weekLogs.length;
 
   const formatDate = (date: Date) => {
-    return date.toLocaleDateString('es-ES', {
-      weekday: 'long',
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
+    return date.toLocaleDateString("es-ES", {
+      weekday: "long",
+      year: "numeric",
+      month: "long",
+      day: "numeric",
     });
   };
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
-      <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
+    <SafeAreaView style={styles.container} edges={["top"]}>
+      <ScrollView
+        style={styles.scrollView}
+        showsVerticalScrollIndicator={false}
+      >
         <View style={styles.header}>
           <Text style={styles.greeting}>
-            Hola, {user?.name || 'Usuario'}
+            Hola, {user?.name || "Usuario"}
           </Text>
           <Text style={styles.date}>{formatDate(new Date())}</Text>
         </View>
@@ -58,16 +62,27 @@ export default function HomeScreen() {
         <View style={styles.cardsContainer}>
           <TouchableOpacity
             style={styles.card}
-            onPress={() => router.push('/log-workout')}>
+            activeOpacity={0.8}
+            onPress={() => router.push("/log-workout")}
+          >
             <View style={styles.cardHeader}>
               <Text style={styles.cardTitle}>Rutina de hoy</Text>
               {todayRoutine && (
                 <View
                   style={[
                     styles.categoryBadge,
-                    { backgroundColor: Colors.muscle[todayRoutine.category] },
-                  ]}>
-                  <Text style={styles.categoryBadgeText}>
+                    {
+                      backgroundColor:
+                        Colors.muscle[todayRoutine.category] + "20",
+                    },
+                  ]}
+                >
+                  <Text
+                    style={[
+                      styles.categoryBadgeText,
+                      { color: Colors.muscle[todayRoutine.category] },
+                    ]}
+                  >
                     {todayRoutine.category}
                   </Text>
                 </View>
@@ -88,17 +103,32 @@ export default function HomeScreen() {
                 </Text>
               </View>
             )}
+            <View style={styles.cardIndicator}>
+              <View
+                style={[
+                  styles.indicatorDot,
+                  todayRoutine && { backgroundColor: Colors.success },
+                ]}
+              />
+              <Text style={styles.indicatorText}>
+                {todayRoutine ? "Completada" : "Pendiente"}
+              </Text>
+            </View>
           </TouchableOpacity>
 
           <View style={styles.card}>
             <View style={styles.cardHeader}>
               <Text style={styles.cardTitle}>Progreso semanal</Text>
+              <View style={styles.weekBadge}>
+                <Text style={styles.weekBadgeText}>7 días</Text>
+              </View>
             </View>
             <View style={styles.cardContent}>
-              <Text style={styles.progressNumber}>{weeklyProgress}</Text>
-              <Text style={styles.cardSubtext}>
-                entrenamientos completados
-              </Text>
+              <View style={styles.progressRow}>
+                <Text style={styles.progressNumber}>{weeklyProgress}</Text>
+                <Text style={styles.progressLabel}>/ 7</Text>
+              </View>
+              <Text style={styles.cardSubtext}>entrenamientos completados</Text>
               <View style={styles.progressBar}>
                 <View
                   style={[
@@ -113,9 +143,38 @@ export default function HomeScreen() {
 
         <TouchableOpacity
           style={styles.quickActionButton}
-          onPress={() => router.push('/log-workout')}>
-          <Text style={styles.quickActionText}>Registrar entrenamiento</Text>
+          activeOpacity={0.85}
+          onPress={() => router.push("/log-workout")}
+        >
+          <LinearGradient
+            colors={[Colors.primary, Colors.primaryDark]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+            style={styles.gradientButton}
+          >
+            <Text style={styles.quickActionText}>
+              ✨ Registrar entrenamiento
+            </Text>
+          </LinearGradient>
         </TouchableOpacity>
+
+        {/* Quick Stats */}
+        <View style={styles.statsContainer}>
+          <View style={styles.statCard}>
+            <Text style={styles.statNumber}>{routines.length}</Text>
+            <Text style={styles.statLabel}>Rutinas</Text>
+          </View>
+          <View style={styles.statCard}>
+            <Text style={styles.statNumber}>
+              {logs.filter((l) => l.completed).length}
+            </Text>
+            <Text style={styles.statLabel}>Total</Text>
+          </View>
+          <View style={styles.statCard}>
+            <Text style={styles.statNumber}>{weeklyProgress}</Text>
+            <Text style={styles.statLabel}>Semana</Text>
+          </View>
+        </View>
       </ScrollView>
     </SafeAreaView>
   );
@@ -131,6 +190,7 @@ const styles = StyleSheet.create({
   },
   header: {
     padding: Spacing.lg,
+    paddingTop: Spacing.xl,
     paddingBottom: Spacing.md,
   },
   greeting: {
@@ -140,32 +200,29 @@ const styles = StyleSheet.create({
   },
   date: {
     ...Typography.body,
-    color: Colors.gray.dark,
-    textTransform: 'capitalize',
+    color: Colors.textSecondary,
+    textTransform: "capitalize",
   },
   cardsContainer: {
     paddingHorizontal: Spacing.lg,
     gap: Spacing.md,
   },
   card: {
-    backgroundColor: Colors.background,
+    backgroundColor: Colors.backgroundCard,
     borderRadius: Colors.ui.borderRadiusLarge,
     padding: Spacing.lg,
-    marginBottom: Spacing.md,
-    ...Colors.ui.shadow,
     borderWidth: 1,
-    borderColor: Colors.gray.light,
+    borderColor: Colors.border,
   },
   cardHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     marginBottom: Spacing.md,
   },
   cardTitle: {
     ...Typography.h3,
     color: Colors.text,
-    fontWeight: '600',
   },
   categoryBadge: {
     paddingHorizontal: Spacing.sm,
@@ -173,53 +230,116 @@ const styles = StyleSheet.create({
     borderRadius: Colors.ui.borderRadius,
   },
   categoryBadgeText: {
-    ...Typography.caption,
-    color: Colors.background,
-    fontWeight: '600',
+    ...Typography.captionMedium,
+    fontWeight: "600",
+  },
+  weekBadge: {
+    paddingHorizontal: Spacing.sm,
+    paddingVertical: Spacing.xs,
+    borderRadius: Colors.ui.borderRadius,
+    backgroundColor: Colors.primary + "20",
+  },
+  weekBadgeText: {
+    ...Typography.small,
+    color: Colors.primary,
+    fontWeight: "600",
   },
   cardContent: {
     gap: Spacing.xs,
   },
   cardText: {
-    ...Typography.body,
+    ...Typography.bodyMedium,
     color: Colors.text,
-    fontWeight: '500',
   },
   cardSubtext: {
     ...Typography.caption,
-    color: Colors.gray.dark,
+    color: Colors.textSecondary,
+  },
+  cardIndicator: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginTop: Spacing.md,
+    paddingTop: Spacing.md,
+    borderTopWidth: 1,
+    borderTopColor: Colors.border,
+    gap: Spacing.sm,
+  },
+  indicatorDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: Colors.textMuted,
+  },
+  indicatorText: {
+    ...Typography.caption,
+    color: Colors.textSecondary,
+  },
+  progressRow: {
+    flexDirection: "row",
+    alignItems: "baseline",
   },
   progressNumber: {
-    ...Typography.h1,
-    color: Colors.muscle.Legs,
     fontSize: 48,
-    fontWeight: '700',
+    fontWeight: "700",
+    color: Colors.primary,
+    letterSpacing: -1,
+  },
+  progressLabel: {
+    ...Typography.h2,
+    color: Colors.textMuted,
+    marginLeft: Spacing.xs,
   },
   progressBar: {
-    height: 8,
-    backgroundColor: Colors.gray.light,
-    borderRadius: 4,
-    marginTop: Spacing.sm,
-    overflow: 'hidden',
+    height: 6,
+    backgroundColor: Colors.backgroundElevated,
+    borderRadius: 3,
+    marginTop: Spacing.md,
+    overflow: "hidden",
   },
   progressBarFill: {
-    height: '100%',
-    backgroundColor: Colors.muscle.Legs,
-    borderRadius: 4,
+    height: "100%",
+    backgroundColor: Colors.primary,
+    borderRadius: 3,
   },
   quickActionButton: {
-    backgroundColor: Colors.muscle.Legs,
     marginHorizontal: Spacing.lg,
-    marginTop: Spacing.md,
-    marginBottom: Spacing.xl,
-    paddingVertical: Spacing.md,
+    marginTop: Spacing.lg,
+    marginBottom: Spacing.md,
     borderRadius: Colors.ui.borderRadius,
-    alignItems: 'center',
-    ...Colors.ui.shadow,
+    overflow: "hidden",
+    ...Colors.ui.shadowGlow,
+  },
+  gradientButton: {
+    paddingVertical: Spacing.md + 2,
+    alignItems: "center",
   },
   quickActionText: {
     ...Typography.h3,
-    color: Colors.background,
-    fontWeight: '600',
+    color: "#FFFFFF",
+    fontWeight: "600",
+  },
+  statsContainer: {
+    flexDirection: "row",
+    paddingHorizontal: Spacing.lg,
+    marginBottom: Spacing.xl,
+    gap: Spacing.md,
+  },
+  statCard: {
+    flex: 1,
+    backgroundColor: Colors.backgroundCard,
+    borderRadius: Colors.ui.borderRadius,
+    padding: Spacing.md,
+    alignItems: "center",
+    borderWidth: 1,
+    borderColor: Colors.border,
+  },
+  statNumber: {
+    ...Typography.h2,
+    color: Colors.text,
+  },
+  statLabel: {
+    ...Typography.small,
+    color: Colors.textMuted,
+    marginTop: Spacing.xs,
   },
 });

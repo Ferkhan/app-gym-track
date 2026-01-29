@@ -1,40 +1,47 @@
-import React, { useState, useRef } from 'react';
+import { LinearGradient } from "expo-linear-gradient";
+import { useRouter } from "expo-router";
+import React, { useRef, useState } from "react";
 import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  Dimensions,
-  TouchableOpacity,
-  NativeScrollEvent,
-  NativeSyntheticEvent,
-} from 'react-native';
-import { useRouter } from 'expo-router';
-import { SafeAreaView } from 'react-native-safe-area-context';
+    Dimensions,
+    NativeScrollEvent,
+    NativeSyntheticEvent,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View,
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
-import { useApp } from '@/context/AppContext';
-import { Colors, Spacing, Typography } from '@/constants/theme';
+import { Colors, Spacing, Typography } from "@/constants/theme";
+import { useApp } from "@/context/AppContext";
 
-const { width } = Dimensions.get('window');
+const { width } = Dimensions.get("window");
 
 const slides = [
   {
     id: 1,
-    title: 'Bienvenido a GymTrack',
-    description: 'Lleva un registro completo de tus rutinas y progreso en el gimnasio de manera sencilla y organizada.',
-    icon: '💪',
+    title: "Bienvenido a GymTrack",
+    description:
+      "Lleva un registro completo de tus rutinas y progreso en el gimnasio de manera sencilla y organizada.",
+    icon: "💪",
+    color: Colors.primary,
   },
   {
     id: 2,
-    title: 'Organiza tus Rutinas',
-    description: 'Crea y gestiona hasta 5 rutinas personalizadas con ejercicios, series y repeticiones.',
-    icon: '📋',
+    title: "Organiza tus Rutinas",
+    description:
+      "Crea y gestiona hasta 5 rutinas personalizadas con ejercicios, series y repeticiones.",
+    icon: "📋",
+    color: Colors.muscle.Back,
   },
   {
     id: 3,
-    title: 'Visualiza tu Progreso',
-    description: 'Lleva un seguimiento diario de tus entrenamientos y observa tu evolución en el calendario.',
-    icon: '📊',
+    title: "Visualiza tu Progreso",
+    description:
+      "Lleva un seguimiento diario de tus entrenamientos y observa tu evolución en el calendario.",
+    icon: "📊",
+    color: Colors.muscle.Arms,
   },
 ];
 
@@ -51,7 +58,10 @@ export default function OnboardingScreen() {
 
   const handleNext = () => {
     if (currentPage < slides.length - 1) {
-      scrollViewRef.current?.scrollTo({ x: (currentPage + 1) * width, animated: true });
+      scrollViewRef.current?.scrollTo({
+        x: (currentPage + 1) * width,
+        animated: true,
+      });
     } else {
       handleFinish();
     }
@@ -59,7 +69,7 @@ export default function OnboardingScreen() {
 
   const handleFinish = async () => {
     await completeOnboarding();
-    router.replace('/login');
+    router.replace("/login");
   };
 
   const handleSkip = () => {
@@ -69,7 +79,7 @@ export default function OnboardingScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.skipContainer}>
-        <TouchableOpacity onPress={handleSkip}>
+        <TouchableOpacity onPress={handleSkip} style={styles.skipButton}>
           <Text style={styles.skipText}>Omitir</Text>
         </TouchableOpacity>
       </View>
@@ -81,11 +91,17 @@ export default function OnboardingScreen() {
         showsHorizontalScrollIndicator={false}
         onScroll={handleScroll}
         scrollEventThrottle={16}
-        style={styles.scrollView}>
+        style={styles.scrollView}
+      >
         {slides.map((slide) => (
           <View key={slide.id} style={styles.slide}>
-            <View style={styles.iconContainer}>
-              <Text style={styles.icon}>{slide.icon}</Text>
+            <View
+              style={[
+                styles.iconContainer,
+                { backgroundColor: slide.color + "15" },
+              ]}
+            >
+            <Text style={styles.icon}>{slide.icon}</Text>
             </View>
             <Text style={styles.title}>{slide.title}</Text>
             <Text style={styles.description}>{slide.description}</Text>
@@ -106,10 +122,21 @@ export default function OnboardingScreen() {
       </View>
 
       <View style={styles.buttonContainer}>
-        <TouchableOpacity style={styles.button} onPress={handleNext}>
-          <Text style={styles.buttonText}>
-            {currentPage === slides.length - 1 ? 'Comenzar' : 'Siguiente'}
-          </Text>
+        <TouchableOpacity
+          style={styles.button}
+          activeOpacity={0.85}
+          onPress={handleNext}
+        >
+          <LinearGradient
+            colors={[Colors.primary, Colors.primaryDark]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+            style={styles.buttonGradient}
+          >
+            <Text style={styles.buttonText}>
+              {currentPage === slides.length - 1 ? "🚀 Comenzar" : "Siguiente"}
+            </Text>
+          </LinearGradient>
         </TouchableOpacity>
       </View>
     </SafeAreaView>
@@ -123,11 +150,15 @@ const styles = StyleSheet.create({
   },
   skipContainer: {
     padding: Spacing.md,
-    alignItems: 'flex-end',
+    alignItems: "flex-end",
+  },
+  skipButton: {
+    paddingHorizontal: Spacing.md,
+    paddingVertical: Spacing.sm,
   },
   skipText: {
-    ...Typography.body,
-    color: Colors.muscle.Legs,
+    ...Typography.bodyMedium,
+    color: Colors.textSecondary,
   },
   scrollView: {
     flex: 1,
@@ -135,60 +166,67 @@ const styles = StyleSheet.create({
   slide: {
     width,
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     paddingHorizontal: Spacing.xl,
   },
   iconContainer: {
+    width: 140,
+    height: 140,
+    borderRadius: 70,
+    justifyContent: "center",
+    alignItems: "center",
     marginBottom: Spacing.xl,
   },
   icon: {
-    fontSize: 80,
+    fontSize: 64,
   },
   title: {
     ...Typography.h1,
     color: Colors.text,
-    textAlign: 'center',
+    textAlign: "center",
     marginBottom: Spacing.md,
   },
   description: {
     ...Typography.body,
-    color: Colors.gray.dark,
-    textAlign: 'center',
-    lineHeight: 24,
+    color: Colors.textSecondary,
+    textAlign: "center",
+    lineHeight: 26,
+    paddingHorizontal: Spacing.md,
   },
   pagination: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingVertical: Spacing.md,
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    paddingVertical: Spacing.lg,
   },
   paginationDot: {
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: Colors.gray.medium,
+    backgroundColor: Colors.textMuted,
     marginHorizontal: 4,
   },
   paginationDotActive: {
-    width: 24,
-    backgroundColor: Colors.muscle.Legs,
+    width: 32,
+    backgroundColor: Colors.primary,
   },
   buttonContainer: {
     padding: Spacing.lg,
     paddingBottom: Spacing.xl,
   },
   button: {
-    backgroundColor: Colors.muscle.Legs,
-    paddingVertical: Spacing.md,
     borderRadius: Colors.ui.borderRadius,
-    alignItems: 'center',
-    ...Colors.ui.shadow,
+    overflow: "hidden",
+    ...Colors.ui.shadowGlow,
+  },
+  buttonGradient: {
+    paddingVertical: Spacing.md + 2,
+    alignItems: "center",
   },
   buttonText: {
     ...Typography.h3,
-    color: Colors.background,
-    fontWeight: '600',
+    color: "#FFFFFF",
+    fontWeight: "600",
   },
 });
-

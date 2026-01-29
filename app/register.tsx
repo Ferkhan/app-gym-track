@@ -1,37 +1,38 @@
-import React, { useState } from 'react';
+import { LinearGradient } from "expo-linear-gradient";
+import { Link, useRouter } from "expo-router";
+import React, { useState } from "react";
 import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  StyleSheet,
-  Alert,
-  KeyboardAvoidingView,
-  Platform,
-  ScrollView,
-} from 'react-native';
-import { useRouter, Link } from 'expo-router';
-import { SafeAreaView } from 'react-native-safe-area-context';
+    Alert,
+    KeyboardAvoidingView,
+    Platform,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View,
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
-import { useApp } from '@/context/AppContext';
-import { Colors, Spacing, Typography } from '@/constants/theme';
+import { Colors, Spacing, Typography } from "@/constants/theme";
+import { useApp } from "@/context/AppContext";
 
 export default function RegisterScreen() {
   const router = useRouter();
   const { register } = useApp();
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleRegister = async () => {
     if (!name.trim() || !email.trim() || !password.trim()) {
-      Alert.alert('Error', 'Por favor completa todos los campos');
+      Alert.alert("Error", "Por favor completa todos los campos");
       return;
     }
 
     if (password.length < 6) {
-      Alert.alert('Error', 'La contraseña debe tener al menos 6 caracteres');
+      Alert.alert("Error", "La contraseña debe tener al menos 6 caracteres");
       return;
     }
 
@@ -39,10 +40,10 @@ export default function RegisterScreen() {
     try {
       const success = await register(name, email, password);
       if (success) {
-        router.replace('/(tabs)');
+        router.replace("/(tabs)");
       }
     } catch (error) {
-      Alert.alert('Error', 'No se pudo crear la cuenta');
+      Alert.alert("Error", "No se pudo crear la cuenta");
     } finally {
       setLoading(false);
     }
@@ -51,8 +52,9 @@ export default function RegisterScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        style={styles.keyboardView}>
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        style={styles.keyboardView}
+      >
         <ScrollView contentContainerStyle={styles.scrollContent}>
           <View style={styles.content}>
             <View style={styles.header}>
@@ -102,11 +104,20 @@ export default function RegisterScreen() {
 
               <TouchableOpacity
                 style={[styles.button, loading && styles.buttonDisabled]}
+                activeOpacity={0.85}
                 onPress={handleRegister}
-                disabled={loading}>
-                <Text style={styles.buttonText}>
-                  {loading ? 'Creando cuenta...' : 'Registrarse'}
-                </Text>
+                disabled={loading}
+              >
+                <LinearGradient
+                  colors={[Colors.primary, Colors.primaryDark]}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 0 }}
+                  style={styles.buttonGradient}
+                >
+                  <Text style={styles.buttonText}>
+                    {loading ? "Creando cuenta..." : "Registrarse"}
+                  </Text>
+                </LinearGradient>
               </TouchableOpacity>
 
               <View style={styles.loginContainer}>
@@ -135,13 +146,14 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     flexGrow: 1,
-    justifyContent: 'center',
+    justifyContent: "center",
   },
   content: {
     paddingHorizontal: Spacing.lg,
     paddingVertical: Spacing.xl,
   },
   header: {
+    alignItems: "center",
     marginBottom: Spacing.xl,
   },
   title: {
@@ -151,59 +163,58 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     ...Typography.body,
-    color: Colors.gray.dark,
+    color: Colors.textSecondary,
   },
   form: {
-    width: '100%',
+    width: "100%",
   },
   inputContainer: {
     marginBottom: Spacing.md,
   },
   label: {
-    ...Typography.caption,
-    color: Colors.text,
+    ...Typography.captionMedium,
+    color: Colors.textSecondary,
     marginBottom: Spacing.xs,
-    fontWeight: '600',
   },
   input: {
     ...Typography.body,
-    backgroundColor: Colors.gray.light,
+    backgroundColor: Colors.backgroundCard,
     borderWidth: 1,
-    borderColor: Colors.gray.medium,
+    borderColor: Colors.border,
     borderRadius: Colors.ui.borderRadius,
     paddingHorizontal: Spacing.md,
     paddingVertical: Spacing.md,
     color: Colors.text,
   },
   button: {
-    backgroundColor: Colors.muscle.Legs,
-    paddingVertical: Spacing.md,
-    borderRadius: Colors.ui.borderRadius,
-    alignItems: 'center',
     marginTop: Spacing.md,
-    ...Colors.ui.shadow,
+    borderRadius: Colors.ui.borderRadius,
+    overflow: "hidden",
+    ...Colors.ui.shadowGlow,
+  },
+  buttonGradient: {
+    paddingVertical: Spacing.md,
+    alignItems: "center",
   },
   buttonDisabled: {
     opacity: 0.6,
   },
   buttonText: {
     ...Typography.h3,
-    color: Colors.background,
-    fontWeight: '600',
+    color: "#FFFFFF",
+    fontWeight: "600",
   },
   loginContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    marginTop: Spacing.lg,
+    flexDirection: "row",
+    justifyContent: "center",
+    marginTop: Spacing.xl,
   },
   loginText: {
     ...Typography.body,
-    color: Colors.gray.dark,
+    color: Colors.textSecondary,
   },
   loginLink: {
-    ...Typography.body,
-    color: Colors.muscle.Legs,
-    fontWeight: '600',
+    ...Typography.bodyMedium,
+    color: Colors.primary,
   },
 });
-

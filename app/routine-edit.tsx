@@ -1,24 +1,24 @@
-import React, { useState, useEffect } from 'react';
+import { useLocalSearchParams, useRouter } from "expo-router";
+import React, { useEffect, useState } from "react";
 import {
-  View,
-  Text,
-  StyleSheet,
-  TextInput,
-  TouchableOpacity,
-  ScrollView,
-  Alert,
-  KeyboardAvoidingView,
-  Platform,
-} from 'react-native';
-import { useRouter, useLocalSearchParams } from 'expo-router';
-import { SafeAreaView } from 'react-native-safe-area-context';
+    Alert,
+    KeyboardAvoidingView,
+    Platform,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View,
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
-import { useApp } from '@/context/AppContext';
-import { RoutineCategory, Exercise } from '@/types';
-import { Colors, Spacing, Typography } from '@/constants/theme';
-import { IconSymbol } from '@/components/ui/icon-symbol';
+import { IconSymbol } from "@/components/ui/icon-symbol";
+import { Colors, Spacing, Typography } from "@/constants/theme";
+import { useApp } from "@/context/AppContext";
+import { Exercise, RoutineCategory } from "@/types";
 
-const CATEGORIES: RoutineCategory[] = ['Legs', 'Back', 'Chest', 'Arms'];
+const CATEGORIES: RoutineCategory[] = ["Legs", "Back", "Chest", "Arms"];
 
 export default function RoutineEditScreen() {
   const router = useRouter();
@@ -28,8 +28,8 @@ export default function RoutineEditScreen() {
   const isEditing = !!id;
   const existingRoutine = isEditing ? routines.find((r) => r.id === id) : null;
 
-  const [name, setName] = useState('');
-  const [category, setCategory] = useState<RoutineCategory>('Legs');
+  const [name, setName] = useState("");
+  const [category, setCategory] = useState<RoutineCategory>("Legs");
   const [exercises, setExercises] = useState<Exercise[]>([]);
 
   useEffect(() => {
@@ -43,16 +43,21 @@ export default function RoutineEditScreen() {
   const handleAddExercise = () => {
     const newExercise: Exercise = {
       id: Date.now().toString(),
-      name: '',
+      name: "",
       sets: 3,
       reps: 10,
     };
     setExercises([...exercises, newExercise]);
   };
 
-  const handleUpdateExercise = (exerciseId: string, updates: Partial<Exercise>) => {
+  const handleUpdateExercise = (
+    exerciseId: string,
+    updates: Partial<Exercise>,
+  ) => {
     setExercises(
-      exercises.map((ex) => (ex.id === exerciseId ? { ...ex, ...updates } : ex))
+      exercises.map((ex) =>
+        ex.id === exerciseId ? { ...ex, ...updates } : ex,
+      ),
     );
   };
 
@@ -62,13 +67,13 @@ export default function RoutineEditScreen() {
 
   const handleSave = () => {
     if (!name.trim()) {
-      Alert.alert('Error', 'El nombre de la rutina es requerido');
+      Alert.alert("Error", "El nombre de la rutina es requerido");
       return;
     }
 
-    const validExercises = exercises.filter((ex) => ex.name.trim() !== '');
+    const validExercises = exercises.filter((ex) => ex.name.trim() !== "");
     if (validExercises.length === 0) {
-      Alert.alert('Error', 'Debes agregar al menos un ejercicio');
+      Alert.alert("Error", "Debes agregar al menos un ejercicio");
       return;
     }
 
@@ -90,24 +95,27 @@ export default function RoutineEditScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
+    <SafeAreaView style={styles.container} edges={["top"]}>
       <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        style={styles.keyboardView}>
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        style={styles.keyboardView}
+      >
         <View style={styles.header}>
           <TouchableOpacity
             style={styles.closeButton}
             onPress={() => router.back()}
-            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
-            <IconSymbol name="xmark" size={24} color={Colors.text} />
+            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+          >
+            <IconSymbol name="xmark" size={20} color={Colors.textSecondary} />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>
-            {isEditing ? 'Editar Rutina' : 'Nueva Rutina'}
+            {isEditing ? "Editar Rutina" : "Nueva Rutina"}
           </Text>
           <TouchableOpacity
             style={styles.saveButton}
             onPress={handleSave}
-            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
+            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+          >
             <Text style={styles.saveButtonText}>Guardar</Text>
           </TouchableOpacity>
         </View>
@@ -115,14 +123,15 @@ export default function RoutineEditScreen() {
         <ScrollView
           style={styles.scrollView}
           contentContainerStyle={styles.scrollContent}
-          showsVerticalScrollIndicator={false}>
+          showsVerticalScrollIndicator={false}
+        >
           <View style={styles.form}>
             <View style={styles.inputContainer}>
               <Text style={styles.label}>Nombre de la rutina</Text>
               <TextInput
                 style={styles.input}
                 placeholder="Ej: Rutina de piernas"
-                placeholderTextColor={Colors.gray.medium}
+                placeholderTextColor={Colors.textMuted}
                 value={name}
                 onChangeText={setName}
               />
@@ -141,12 +150,14 @@ export default function RoutineEditScreen() {
                       },
                       category === cat && styles.categoryButtonActive,
                     ]}
-                    onPress={() => setCategory(cat)}>
+                    onPress={() => setCategory(cat)}
+                  >
                     <Text
                       style={[
                         styles.categoryButtonText,
                         category === cat && styles.categoryButtonTextActive,
-                      ]}>
+                      ]}
+                    >
                       {cat}
                     </Text>
                   </TouchableOpacity>
@@ -159,8 +170,9 @@ export default function RoutineEditScreen() {
                 <Text style={styles.label}>Ejercicios</Text>
                 <TouchableOpacity
                   style={styles.addExerciseButton}
-                  onPress={handleAddExercise}>
-                  <IconSymbol name="add" size={20} color={Colors.muscle.Legs} />
+                  onPress={handleAddExercise}
+                >
+                  <IconSymbol name="add" size={18} color={Colors.primary} />
                   <Text style={styles.addExerciseText}>Agregar</Text>
                 </TouchableOpacity>
               </View>
@@ -168,10 +180,13 @@ export default function RoutineEditScreen() {
               {exercises.map((exercise, index) => (
                 <View key={exercise.id} style={styles.exerciseCard}>
                   <View style={styles.exerciseCardHeader}>
-                    <Text style={styles.exerciseNumber}>Ejercicio {index + 1}</Text>
+                    <Text style={styles.exerciseNumber}>
+                      Ejercicio {index + 1}
+                    </Text>
                     <TouchableOpacity
                       onPress={() => handleRemoveExercise(exercise.id)}
-                      hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
+                      hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                    >
                       <IconSymbol name="trash" size={20} color={Colors.error} />
                     </TouchableOpacity>
                   </View>
@@ -182,7 +197,7 @@ export default function RoutineEditScreen() {
                       <TextInput
                         style={styles.exerciseTextInput}
                         placeholder="Nombre del ejercicio"
-                        placeholderTextColor={Colors.gray.medium}
+                        placeholderTextColor={Colors.textMuted}
                         value={exercise.name}
                         onChangeText={(text) =>
                           handleUpdateExercise(exercise.id, { name: text })
@@ -191,12 +206,14 @@ export default function RoutineEditScreen() {
                     </View>
 
                     <View style={styles.exerciseInputRow}>
-                      <View style={[styles.exerciseInput, styles.exerciseInputHalf]}>
+                      <View
+                        style={[styles.exerciseInput, styles.exerciseInputHalf]}
+                      >
                         <Text style={styles.exerciseLabel}>Series</Text>
                         <TextInput
                           style={styles.exerciseTextInput}
                           placeholder="3"
-                          placeholderTextColor={Colors.gray.medium}
+                          placeholderTextColor={Colors.textMuted}
                           value={exercise.sets.toString()}
                           onChangeText={(text) => {
                             const sets = parseInt(text) || 0;
@@ -206,12 +223,14 @@ export default function RoutineEditScreen() {
                         />
                       </View>
 
-                      <View style={[styles.exerciseInput, styles.exerciseInputHalf]}>
+                      <View
+                        style={[styles.exerciseInput, styles.exerciseInputHalf]}
+                      >
                         <Text style={styles.exerciseLabel}>Reps</Text>
                         <TextInput
                           style={styles.exerciseTextInput}
                           placeholder="10"
-                          placeholderTextColor={Colors.gray.medium}
+                          placeholderTextColor={Colors.textMuted}
                           value={exercise.reps.toString()}
                           onChangeText={(text) => {
                             const reps = parseInt(text) || 0;
@@ -249,28 +268,36 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     padding: Spacing.md,
     borderBottomWidth: 1,
-    borderBottomColor: Colors.gray.light,
+    borderBottomColor: Colors.border,
   },
   closeButton: {
-    padding: Spacing.xs,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: Colors.backgroundCard,
+    justifyContent: "center",
+    alignItems: "center",
+    borderWidth: 1,
+    borderColor: Colors.border,
   },
   headerTitle: {
-    ...Typography.h2,
+    ...Typography.h3,
     color: Colors.text,
-    fontWeight: '600',
   },
   saveButton: {
-    padding: Spacing.xs,
+    paddingHorizontal: Spacing.md,
+    paddingVertical: Spacing.sm,
+    backgroundColor: Colors.primary,
+    borderRadius: Colors.ui.borderRadius,
   },
   saveButtonText: {
-    ...Typography.body,
-    color: Colors.muscle.Legs,
-    fontWeight: '600',
+    ...Typography.bodyMedium,
+    color: Colors.text,
   },
   scrollView: {
     flex: 1,
@@ -285,24 +312,25 @@ const styles = StyleSheet.create({
     marginBottom: Spacing.lg,
   },
   label: {
-    ...Typography.body,
-    color: Colors.text,
-    fontWeight: '600',
+    ...Typography.captionMedium,
+    color: Colors.textSecondary,
+    textTransform: "uppercase",
+    letterSpacing: 0.5,
     marginBottom: Spacing.sm,
   },
   input: {
     ...Typography.body,
-    backgroundColor: Colors.gray.light,
+    backgroundColor: Colors.backgroundCard,
     borderWidth: 1,
-    borderColor: Colors.gray.medium,
+    borderColor: Colors.border,
     borderRadius: Colors.ui.borderRadius,
     paddingHorizontal: Spacing.md,
     paddingVertical: Spacing.md,
     color: Colors.text,
   },
   categoryContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
+    flexDirection: "row",
+    flexWrap: "wrap",
     gap: Spacing.sm,
   },
   categoryButton: {
@@ -310,58 +338,59 @@ const styles = StyleSheet.create({
     paddingVertical: Spacing.sm,
     borderRadius: Colors.ui.borderRadius,
     borderWidth: 2,
-    borderColor: Colors.gray.medium,
-    backgroundColor: Colors.gray.light,
+    borderColor: Colors.border,
+    backgroundColor: Colors.backgroundCard,
   },
   categoryButtonActive: {
     // Border color is set dynamically in the component
   },
   categoryButtonText: {
-    ...Typography.body,
-    color: Colors.text,
-    fontWeight: '500',
+    ...Typography.bodyMedium,
+    color: Colors.textSecondary,
   },
   categoryButtonTextActive: {
-    color: Colors.background,
-    fontWeight: '600',
+    color: Colors.text,
+    fontWeight: "600",
   },
   exercisesSection: {
     marginTop: Spacing.md,
   },
   exercisesHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     marginBottom: Spacing.md,
   },
   addExerciseButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: Spacing.xs,
-    paddingHorizontal: Spacing.sm,
-    paddingVertical: Spacing.xs,
+    paddingHorizontal: Spacing.md,
+    paddingVertical: Spacing.sm,
+    backgroundColor: Colors.primary + "15",
+    borderRadius: Colors.ui.borderRadius,
   },
   addExerciseText: {
-    ...Typography.body,
-    color: Colors.muscle.Legs,
-    fontWeight: '600',
+    ...Typography.bodyMedium,
+    color: Colors.primary,
   },
   exerciseCard: {
-    backgroundColor: Colors.gray.light,
+    backgroundColor: Colors.backgroundCard,
     borderRadius: Colors.ui.borderRadius,
     padding: Spacing.md,
     marginBottom: Spacing.md,
+    borderWidth: 1,
+    borderColor: Colors.border,
   },
   exerciseCardHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     marginBottom: Spacing.md,
   },
   exerciseNumber: {
-    ...Typography.body,
+    ...Typography.bodyMedium,
     color: Colors.text,
-    fontWeight: '600',
   },
   exerciseInputs: {
     gap: Spacing.sm,
@@ -370,7 +399,7 @@ const styles = StyleSheet.create({
     marginBottom: Spacing.sm,
   },
   exerciseInputRow: {
-    flexDirection: 'row',
+    flexDirection: "row",
     gap: Spacing.sm,
   },
   exerciseInputHalf: {
@@ -378,15 +407,14 @@ const styles = StyleSheet.create({
   },
   exerciseLabel: {
     ...Typography.caption,
-    color: Colors.text,
-    fontWeight: '500',
+    color: Colors.textSecondary,
     marginBottom: Spacing.xs,
   },
   exerciseTextInput: {
     ...Typography.body,
-    backgroundColor: Colors.background,
+    backgroundColor: Colors.backgroundSecondary,
     borderWidth: 1,
-    borderColor: Colors.gray.medium,
+    borderColor: Colors.border,
     borderRadius: Colors.ui.borderRadius,
     paddingHorizontal: Spacing.sm,
     paddingVertical: Spacing.sm,
@@ -394,12 +422,16 @@ const styles = StyleSheet.create({
   },
   emptyExercises: {
     padding: Spacing.xl,
-    alignItems: 'center',
+    alignItems: "center",
+    backgroundColor: Colors.backgroundCard,
+    borderRadius: Colors.ui.borderRadius,
+    borderWidth: 1,
+    borderColor: Colors.border,
+    borderStyle: "dashed",
   },
   emptyText: {
     ...Typography.body,
-    color: Colors.gray.dark,
-    textAlign: 'center',
+    color: Colors.textSecondary,
+    textAlign: "center",
   },
 });
-

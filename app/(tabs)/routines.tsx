@@ -1,19 +1,20 @@
-import React from 'react';
+import { LinearGradient } from "expo-linear-gradient";
+import { useRouter } from "expo-router";
+import React from "react";
 import {
-  View,
-  Text,
-  StyleSheet,
-  FlatList,
-  TouchableOpacity,
   Alert,
-} from 'react-native';
-import { useRouter } from 'expo-router';
-import { SafeAreaView } from 'react-native-safe-area-context';
+  FlatList,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
-import { useApp } from '@/context/AppContext';
-import { Routine } from '@/types';
-import { Colors, Spacing, Typography } from '@/constants/theme';
-import { IconSymbol } from '@/components/ui/icon-symbol';
+import { IconSymbol } from "@/components/ui/icon-symbol";
+import { Colors, Spacing, Typography } from "@/constants/theme";
+import { useApp } from "@/context/AppContext";
+import { Routine } from "@/types";
 
 export default function RoutinesScreen() {
   const router = useRouter();
@@ -22,28 +23,28 @@ export default function RoutinesScreen() {
   const handleAddRoutine = () => {
     if (routines.length >= 5) {
       Alert.alert(
-        'Límite alcanzado',
-        'Solo puedes tener un máximo de 5 rutinas.'
+        "Límite alcanzado",
+        "Solo puedes tener un máximo de 5 rutinas.",
       );
       return;
     }
-    router.push('/routine-edit');
+    router.push("/routine-edit");
   };
 
   const handleDeleteRoutine = (routine: Routine) => {
     Alert.alert(
-      'Eliminar rutina',
+      "Eliminar rutina",
       `¿Estás seguro de que deseas eliminar la rutina "${routine.name}"?`,
       [
-        { text: 'Cancelar', style: 'cancel' },
+        { text: "Cancelar", style: "cancel" },
         {
-          text: 'Eliminar',
-          style: 'destructive',
+          text: "Eliminar",
+          style: "destructive",
           onPress: () => {
             deleteRoutine(routine.id);
           },
         },
-      ]
+      ],
     );
   };
 
@@ -61,7 +62,8 @@ export default function RoutinesScreen() {
     return (
       <TouchableOpacity
         style={styles.routineCard}
-        onPress={() => handleViewRoutine(item)}>
+        onPress={() => handleViewRoutine(item)}
+      >
         <View style={styles.routineHeader}>
           <View style={styles.routineInfo}>
             <View
@@ -79,20 +81,23 @@ export default function RoutinesScreen() {
             <TouchableOpacity
               style={styles.actionButton}
               onPress={() => handleEditRoutine(item)}
-              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
+              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+            >
               <IconSymbol name="pencil" size={20} color={Colors.gray.dark} />
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.actionButton}
               onPress={() => handleDeleteRoutine(item)}
-              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
+              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+            >
               <IconSymbol name="trash" size={20} color={Colors.error} />
             </TouchableOpacity>
           </View>
         </View>
         <View style={styles.routineFooter}>
           <Text style={styles.exerciseCount}>
-            {item.exercises.length} ejercicio{item.exercises.length !== 1 ? 's' : ''}
+            {item.exercises.length} ejercicio
+            {item.exercises.length !== 1 ? "s" : ""}
           </Text>
         </View>
       </TouchableOpacity>
@@ -100,17 +105,21 @@ export default function RoutinesScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
+    <SafeAreaView style={styles.container} edges={["top"]}>
       <View style={styles.header}>
         <Text style={styles.title}>Mis Rutinas</Text>
-        <Text style={styles.subtitle}>
-          {routines.length}/5 rutinas creadas
-        </Text>
+        <Text style={styles.subtitle}>{routines.length}/5 rutinas creadas</Text>
       </View>
 
       {routines.length === 0 ? (
         <View style={styles.emptyContainer}>
-          <Text style={styles.emptyIcon}>📋</Text>
+          <View style={styles.infoIcon}>
+              <IconSymbol
+                name="clipboard.fill"
+                size={60}
+                color={Colors.primary}
+              />
+          </View>
           <Text style={styles.emptyTitle}>No hay rutinas</Text>
           <Text style={styles.emptyText}>
             Crea tu primera rutina para comenzar
@@ -131,10 +140,23 @@ export default function RoutinesScreen() {
           styles.addButton,
           routines.length >= 5 && styles.addButtonDisabled,
         ]}
+        activeOpacity={0.85}
         onPress={handleAddRoutine}
-        disabled={routines.length >= 5}>
-        <IconSymbol name="add" size={24} color={Colors.background} />
-        <Text style={styles.addButtonText}>Nueva Rutina</Text>
+        disabled={routines.length >= 5}
+      >
+        <LinearGradient
+          colors={
+            routines.length >= 5
+              ? [Colors.gray.medium, Colors.gray.medium]
+              : [Colors.primary, Colors.primaryDark]
+          }
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 0 }}
+          style={styles.addButtonGradient}
+        >
+          <IconSymbol name="plus" size={24} color="#FFFFFF" />
+          <Text style={styles.addButtonText}>Nueva Rutina</Text>
+        </LinearGradient>
       </TouchableOpacity>
     </SafeAreaView>
   );
@@ -156,30 +178,30 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     ...Typography.caption,
-    color: Colors.gray.dark,
+    color: Colors.textSecondary,
   },
   listContent: {
     paddingHorizontal: Spacing.lg,
-    paddingBottom: Spacing.xl,
+    paddingBottom: 100,
   },
   routineCard: {
-    backgroundColor: Colors.background,
+    backgroundColor: Colors.backgroundCard,
     borderRadius: Colors.ui.borderRadiusLarge,
     padding: Spacing.md,
     marginBottom: Spacing.md,
     ...Colors.ui.shadow,
     borderWidth: 1,
-    borderColor: Colors.gray.light,
+    borderColor: Colors.border,
   },
   routineHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     marginBottom: Spacing.sm,
   },
   routineInfo: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     flex: 1,
   },
   categoryIndicator: {
@@ -194,33 +216,38 @@ const styles = StyleSheet.create({
   routineName: {
     ...Typography.h3,
     color: Colors.text,
-    fontWeight: '600',
+    fontWeight: "600",
     marginBottom: Spacing.xs,
   },
   routineCategory: {
     ...Typography.caption,
-    color: Colors.gray.dark,
+    color: Colors.textSecondary,
   },
   routineActions: {
-    flexDirection: 'row',
+    flexDirection: "row",
     gap: Spacing.sm,
   },
   actionButton: {
-    padding: Spacing.xs,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: Colors.backgroundElevated,
+    justifyContent: "center",
+    alignItems: "center",
   },
   routineFooter: {
     paddingTop: Spacing.sm,
     borderTopWidth: 1,
-    borderTopColor: Colors.gray.light,
+    borderTopColor: Colors.border,
   },
   exerciseCount: {
     ...Typography.caption,
-    color: Colors.gray.dark,
+    color: Colors.textSecondary,
   },
   emptyContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     paddingHorizontal: Spacing.xl,
   },
   emptyIcon: {
@@ -234,28 +261,40 @@ const styles = StyleSheet.create({
   },
   emptyText: {
     ...Typography.body,
-    color: Colors.gray.dark,
-    textAlign: 'center',
+    color: Colors.textSecondary,
+    textAlign: "center",
   },
   addButton: {
-    backgroundColor: Colors.muscle.Legs,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginHorizontal: Spacing.lg,
-    marginBottom: Spacing.lg,
-    paddingVertical: Spacing.md,
+    position: "absolute",
+    bottom: Spacing.lg,
+    left: Spacing.lg,
+    right: Spacing.lg,
     borderRadius: Colors.ui.borderRadius,
+    overflow: "hidden",
+    ...Colors.ui.shadowGlow,
+  },
+  addButtonGradient: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: Spacing.md,
     gap: Spacing.sm,
-    ...Colors.ui.shadow,
   },
   addButtonDisabled: {
     opacity: 0.5,
   },
   addButtonText: {
     ...Typography.h3,
-    color: Colors.background,
-    fontWeight: '600',
+    color: "#FFFFFF",
+    fontWeight: "600",
+  },
+  infoIcon: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    backgroundColor: Colors.primary + "15",
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: Spacing.md,
   },
 });
-

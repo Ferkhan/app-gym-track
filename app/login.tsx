@@ -1,30 +1,32 @@
-import React, { useState } from 'react';
+import { LinearGradient } from "expo-linear-gradient";
+import { Link, useRouter } from "expo-router";
+import React, { useState } from "react";
 import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  StyleSheet,
-  Alert,
-  KeyboardAvoidingView,
-  Platform,
-} from 'react-native';
-import { useRouter, Link } from 'expo-router';
-import { SafeAreaView } from 'react-native-safe-area-context';
+    Alert,
+    KeyboardAvoidingView,
+    Platform,
+    StyleSheet,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View,
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { IconSymbol } from "@/components/ui/icon-symbol";
 
-import { useApp } from '@/context/AppContext';
-import { Colors, Spacing, Typography } from '@/constants/theme';
+import { Colors, Spacing, Typography } from "@/constants/theme";
+import { useApp } from "@/context/AppContext";
 
 export default function LoginScreen() {
   const router = useRouter();
   const { login } = useApp();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleLogin = async () => {
     if (!email.trim() || !password.trim()) {
-      Alert.alert('Error', 'Por favor completa todos los campos');
+      Alert.alert("Error", "Por favor completa todos los campos");
       return;
     }
 
@@ -32,10 +34,10 @@ export default function LoginScreen() {
     try {
       const success = await login(email, password);
       if (success) {
-        router.replace('/(tabs)');
+        router.replace("/(tabs)");
       }
     } catch (error) {
-      Alert.alert('Error', 'No se pudo iniciar sesión');
+      Alert.alert("Error", "No se pudo iniciar sesión");
     } finally {
       setLoading(false);
     }
@@ -44,10 +46,18 @@ export default function LoginScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        style={styles.keyboardView}>
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        style={styles.keyboardView}
+      >
         <View style={styles.content}>
           <View style={styles.header}>
+            <View style={styles.logoContainer}>
+                <IconSymbol
+                  name="dumbbell.fill"
+                  size={60}
+                  color={Colors.primary}
+                />
+            </View>
             <Text style={styles.title}>Bienvenido</Text>
             <Text style={styles.subtitle}>Inicia sesión para continuar</Text>
           </View>
@@ -58,7 +68,7 @@ export default function LoginScreen() {
               <TextInput
                 style={styles.input}
                 placeholder="tu@correo.com"
-                placeholderTextColor={Colors.gray.medium}
+                placeholderTextColor={Colors.textMuted}
                 value={email}
                 onChangeText={setEmail}
                 keyboardType="email-address"
@@ -72,7 +82,7 @@ export default function LoginScreen() {
               <TextInput
                 style={styles.input}
                 placeholder="••••••••"
-                placeholderTextColor={Colors.gray.medium}
+                placeholderTextColor={Colors.textMuted}
                 value={password}
                 onChangeText={setPassword}
                 secureTextEntry
@@ -82,11 +92,20 @@ export default function LoginScreen() {
 
             <TouchableOpacity
               style={[styles.button, loading && styles.buttonDisabled]}
+              activeOpacity={0.85}
               onPress={handleLogin}
-              disabled={loading}>
-              <Text style={styles.buttonText}>
-                {loading ? 'Iniciando sesión...' : 'Iniciar sesión'}
-              </Text>
+              disabled={loading}
+            >
+              <LinearGradient
+                colors={[Colors.primary, Colors.primaryDark]}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 0 }}
+                style={styles.buttonGradient}
+              >
+                <Text style={styles.buttonText}>
+                  {loading ? "Iniciando sesión..." : "Iniciar sesión"}
+                </Text>
+              </LinearGradient>
             </TouchableOpacity>
 
             <View style={styles.registerContainer}>
@@ -114,11 +133,26 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
-    justifyContent: 'center',
+    justifyContent: "center",
     paddingHorizontal: Spacing.lg,
   },
   header: {
+    alignItems: "center",
     marginBottom: Spacing.xl,
+  },
+  logoContainer: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: Colors.backgroundCard,
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: Spacing.lg,
+    borderWidth: 1,
+    borderColor: Colors.border,
+  },
+  logo: {
+    fontSize: 40,
   },
   title: {
     ...Typography.h1,
@@ -127,59 +161,67 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     ...Typography.body,
-    color: Colors.gray.dark,
+    color: Colors.textSecondary,
   },
   form: {
-    width: '100%',
+    width: "100%",
   },
   inputContainer: {
     marginBottom: Spacing.md,
   },
   label: {
-    ...Typography.caption,
-    color: Colors.text,
+    ...Typography.captionMedium,
+    color: Colors.textSecondary,
     marginBottom: Spacing.xs,
-    fontWeight: '600',
   },
   input: {
     ...Typography.body,
-    backgroundColor: Colors.gray.light,
+    backgroundColor: Colors.backgroundCard,
     borderWidth: 1,
-    borderColor: Colors.gray.medium,
+    borderColor: Colors.border,
     borderRadius: Colors.ui.borderRadius,
     paddingHorizontal: Spacing.md,
     paddingVertical: Spacing.md,
     color: Colors.text,
   },
   button: {
-    backgroundColor: Colors.muscle.Legs,
-    paddingVertical: Spacing.md,
-    borderRadius: Colors.ui.borderRadius,
-    alignItems: 'center',
     marginTop: Spacing.md,
-    ...Colors.ui.shadow,
+    borderRadius: Colors.ui.borderRadius,
+    overflow: "hidden",
+    ...Colors.ui.shadowGlow,
+  },
+  buttonGradient: {
+    paddingVertical: Spacing.md,
+    alignItems: "center",
   },
   buttonDisabled: {
     opacity: 0.6,
   },
   buttonText: {
     ...Typography.h3,
-    color: Colors.background,
-    fontWeight: '600',
+    color: "#FFFFFF",
+    fontWeight: "600",
   },
   registerContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    marginTop: Spacing.lg,
+    flexDirection: "row",
+    justifyContent: "center",
+    marginTop: Spacing.xl,
   },
   registerText: {
     ...Typography.body,
-    color: Colors.gray.dark,
+    color: Colors.textSecondary,
   },
   registerLink: {
-    ...Typography.body,
-    color: Colors.muscle.Legs,
-    fontWeight: '600',
+    ...Typography.bodyMedium,
+    color: Colors.primary,
+  },
+  infoIcon: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: Colors.primary + "15",
+    justifyContent: "center",
+    alignItems: "center",
+    marginRight: Spacing.md,
   },
 });
-
