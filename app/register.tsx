@@ -27,19 +27,28 @@ export default function RegisterScreen() {
 
   const handleRegister = async () => {
     if (!name.trim() || !email.trim() || !password.trim()) {
-      Alert.alert("Error", "Por favor completa todos los campos");
+      Alert.alert(
+        "Campos incompletos",
+        "Parece que faltan algunos datos. Completa todos los campos para continuar.",
+      );
       return;
     }
 
     // Validar formato de email
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email.trim())) {
-      Alert.alert("Error", "Por favor ingresa un correo válido");
+      Alert.alert(
+        "Correo inválido",
+        "Por favor, verifica que tu correo esté bien escrito.",
+      );
       return;
     }
 
     if (password.length < 6) {
-      Alert.alert("Error", "La contraseña debe tener al menos 6 caracteres");
+      Alert.alert(
+        "Contraseña muy corta",
+        "Tu contraseña debe tener al menos 6 caracteres para mayor seguridad.",
+      );
       return;
     }
 
@@ -47,12 +56,17 @@ export default function RegisterScreen() {
     try {
       const success = await register(name.trim(), email.trim(), password);
       if (success) {
-        Alert.alert("¡Bienvenido!", "Tu cuenta ha sido creada exitosamente", [
-          { text: "OK", onPress: () => router.replace("/(tabs)") },
-        ]);
+        Alert.alert(
+          "Bienvenido a GymTrack",
+          "Tu cuenta ha sido creada. ¡Es hora de entrenar!",
+          [{ text: "Vamos", onPress: () => router.replace("/(tabs)") }],
+        );
       }
     } catch (error: any) {
-      Alert.alert("Error", error.message || "No se pudo crear la cuenta");
+      Alert.alert(
+        "No pudimos crear tu cuenta",
+        error.message || "Intenta de nuevo en unos momentos.",
+      );
     } finally {
       setLoading(false);
     }

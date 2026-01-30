@@ -2,12 +2,12 @@ import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
-    Alert,
-    FlatList,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  Alert,
+  FlatList,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -28,27 +28,34 @@ export default function LogWorkoutScreen() {
   const handleLogWorkout = (routine: Routine) => {
     if (completedToday.includes(routine.id)) {
       Alert.alert(
-        "Rutina ya completada",
-        `La rutina "${routine.name}" ya fue marcada como completada hoy. ¿Deseas desmarcarla?`,
+        "Ya entrenaste esto hoy",
+        `"${routine.name}" ya está marcada como completada. ¿Quieres desmarcarla?`,
         [
-          { text: "Cancelar", style: "cancel" },
+          { text: "Mantener", style: "cancel" },
           {
             text: "Desmarcar",
             onPress: () => {
               logWorkout(routine.id, today);
-              Alert.alert("Éxito", "Rutina desmarcada");
+              Alert.alert(
+                "Listo",
+                "Rutina desmarcada. La puedes completar después.",
+              );
             },
           },
         ],
       );
     } else {
       logWorkout(routine.id, today);
-      Alert.alert("¡Éxito!", `Rutina "${routine.name}" registrada para hoy.`, [
-        {
-          text: "OK",
-          onPress: () => router.back(),
-        },
-      ]);
+      Alert.alert(
+        "Excelente trabajo",
+        `"${routine.name}" registrada. ¡Sigue así!`,
+        [
+          {
+            text: "Gracias",
+            onPress: () => router.back(),
+          },
+        ],
+      );
     }
   };
 

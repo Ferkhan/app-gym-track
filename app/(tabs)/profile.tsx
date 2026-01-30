@@ -72,8 +72,8 @@ export default function ProfileScreen() {
 
     if (status !== "granted") {
       Alert.alert(
-        "Permiso requerido",
-        "Necesitamos acceso a tu galería para seleccionar una foto",
+        "Permiso necesario",
+        "Para elegir una foto, necesitamos acceso a tu galería. Puedes habilitarlo en Configuración.",
       );
       return;
     }
@@ -99,8 +99,8 @@ export default function ProfileScreen() {
 
     if (status !== "granted") {
       Alert.alert(
-        "Permiso requerido",
-        "Necesitamos acceso a tu cámara para tomar una foto",
+        "Permiso necesario",
+        "Para tomar una foto, necesitamos acceso a tu cámara. Puedes habilitarlo en Configuración.",
       );
       return;
     }
@@ -128,7 +128,10 @@ export default function ProfileScreen() {
 
   const handleSaveName = () => {
     if (!name.trim()) {
-      Alert.alert("Error", "El nombre no puede estar vacío");
+      Alert.alert(
+        "Nombre vacío",
+        "Tu nombre no puede estar vacío. ¿Cómo te llamamos?",
+      );
       return;
     }
     if (user) {
@@ -138,10 +141,10 @@ export default function ProfileScreen() {
   };
 
   const handleLogout = () => {
-    Alert.alert("Cerrar sesión", "¿Estás seguro de que deseas cerrar sesión?", [
-      { text: "Cancelar", style: "cancel" },
+    Alert.alert("¿Ya te vas?", "¿Estás seguro de que deseas cerrar sesión?", [
+      { text: "Me quedo", style: "cancel" },
       {
-        text: "Cerrar sesión",
+        text: "Sí, salir",
         style: "destructive",
         onPress: async () => {
           await logout();
@@ -153,18 +156,18 @@ export default function ProfileScreen() {
 
   const handleClearData = () => {
     Alert.alert(
-      "Eliminar todos los datos",
-      "¿Estás seguro? Esta acción no se puede deshacer. Se eliminarán todas tus rutinas, registros y configuración.",
+      "Momento importante",
+      "Esto eliminará todas tus rutinas, registros y configuración. Esta acción no se puede deshacer. ¿Estás seguro?",
       [
         { text: "Cancelar", style: "cancel" },
         {
-          text: "Eliminar",
+          text: "Sí, eliminar todo",
           style: "destructive",
           onPress: async () => {
             await clearAllData();
             Alert.alert(
-              "Datos eliminados",
-              "Todos los datos han sido eliminados.",
+              "Listo",
+              "Todos los datos han sido eliminados. ¡Empezamos de cero!",
             );
           },
         },

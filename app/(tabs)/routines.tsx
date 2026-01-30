@@ -24,7 +24,7 @@ export default function RoutinesScreen() {
     if (routines.length >= 5) {
       Alert.alert(
         "Límite alcanzado",
-        "Solo puedes tener un máximo de 5 rutinas.",
+        "Solo puedes tener hasta 5 rutinas. Elimina una para crear otra nueva.",
       );
       return;
     }
@@ -33,12 +33,12 @@ export default function RoutinesScreen() {
 
   const handleDeleteRoutine = (routine: Routine) => {
     Alert.alert(
-      "Eliminar rutina",
-      `¿Estás seguro de que deseas eliminar la rutina "${routine.name}"?`,
+      "¿Eliminar rutina?",
+      `¿Seguro que quieres eliminar "${routine.name}"? Esta acción no se puede deshacer.`,
       [
         { text: "Cancelar", style: "cancel" },
         {
-          text: "Eliminar",
+          text: "Sí, eliminar",
           style: "destructive",
           onPress: () => {
             deleteRoutine(routine.id);
@@ -114,11 +114,11 @@ export default function RoutinesScreen() {
       {routines.length === 0 ? (
         <View style={styles.emptyContainer}>
           <View style={styles.infoIcon}>
-              <IconSymbol
-                name="clipboard.fill"
-                size={60}
-                color={Colors.primary}
-              />
+            <IconSymbol
+              name="clipboard.fill"
+              size={60}
+              color={Colors.primary}
+            />
           </View>
           <Text style={styles.emptyTitle}>No hay rutinas</Text>
           <Text style={styles.emptyText}>

@@ -1,15 +1,15 @@
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
-    Alert,
-    KeyboardAvoidingView,
-    Platform,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  Alert,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -67,13 +67,19 @@ export default function RoutineEditScreen() {
 
   const handleSave = () => {
     if (!name.trim()) {
-      Alert.alert("Error", "El nombre de la rutina es requerido");
+      Alert.alert(
+        "Falta el nombre",
+        "Dale un nombre a tu rutina para poder guardarla.",
+      );
       return;
     }
 
     const validExercises = exercises.filter((ex) => ex.name.trim() !== "");
     if (validExercises.length === 0) {
-      Alert.alert("Error", "Debes agregar al menos un ejercicio");
+      Alert.alert(
+        "Sin ejercicios",
+        "Agrega al menos un ejercicio a tu rutina.",
+      );
       return;
     }
 

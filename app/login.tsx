@@ -26,14 +26,20 @@ export default function LoginScreen() {
 
   const handleLogin = async () => {
     if (!email.trim() || !password.trim()) {
-      Alert.alert("Error", "Por favor completa todos los campos");
+      Alert.alert(
+        "Campos incompletos",
+        "Parece que faltan algunos datos. Completa todos los campos para continuar.",
+      );
       return;
     }
 
     // Validar formato de email
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email.trim())) {
-      Alert.alert("Error", "Por favor ingresa un correo válido");
+      Alert.alert(
+        "Correo inválido",
+        "Por favor, verifica que tu correo esté bien escrito.",
+      );
       return;
     }
 
@@ -44,7 +50,10 @@ export default function LoginScreen() {
         router.replace("/(tabs)");
       }
     } catch (error: any) {
-      Alert.alert("Error", error.message || "No se pudo iniciar sesión");
+      Alert.alert(
+        "No pudimos iniciar sesión",
+        error.message || "Verifica tus datos e intenta de nuevo.",
+      );
     } finally {
       setLoading(false);
     }
