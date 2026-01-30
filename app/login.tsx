@@ -1,18 +1,18 @@
+import { IconSymbol } from "@/components/ui/icon-symbol";
 import { LinearGradient } from "expo-linear-gradient";
 import { Link, useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
-    Alert,
-    KeyboardAvoidingView,
-    Platform,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  Alert,
+  KeyboardAvoidingView,
+  Platform,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { IconSymbol } from "@/components/ui/icon-symbol";
 
 import { Colors, Spacing, Typography } from "@/constants/theme";
 import { useApp } from "@/context/AppContext";
@@ -59,11 +59,11 @@ export default function LoginScreen() {
         <View style={styles.content}>
           <View style={styles.header}>
             <View style={styles.logoContainer}>
-                <IconSymbol
-                  name="dumbbell.fill"
-                  size={60}
-                  color={Colors.primary}
-                />
+              <IconSymbol
+                name="dumbbell.fill"
+                size={60}
+                color={Colors.primary}
+              />
             </View>
             <Text style={styles.title}>Bienvenido</Text>
             <Text style={styles.subtitle}>Inicia sesión para continuar</Text>

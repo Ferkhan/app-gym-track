@@ -2,15 +2,15 @@ import { LinearGradient } from "expo-linear-gradient";
 import { Link, useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
-    Alert,
-    KeyboardAvoidingView,
-    Platform,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  Alert,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -47,11 +47,9 @@ export default function RegisterScreen() {
     try {
       const success = await register(name.trim(), email.trim(), password);
       if (success) {
-        Alert.alert(
-          "¡Bienvenido!",
-          "Tu cuenta ha sido creada exitosamente",
-          [{ text: "OK", onPress: () => router.replace("/(tabs)") }]
-        );
+        Alert.alert("¡Bienvenido!", "Tu cuenta ha sido creada exitosamente", [
+          { text: "OK", onPress: () => router.replace("/(tabs)") },
+        ]);
       }
     } catch (error: any) {
       Alert.alert("Error", error.message || "No se pudo crear la cuenta");

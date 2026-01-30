@@ -1,6 +1,12 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { User, Routine, DailyLog, RoutineCategory } from '@/types';
+import { DailyLog, Routine, User } from "@/types";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import React, {
+  createContext,
+  ReactNode,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
 
 interface AppContextType {
   user: User | null;
@@ -12,7 +18,7 @@ interface AppContextType {
   login: (email: string, password: string) => Promise<boolean>;
   register: (name: string, email: string, password: string) => Promise<boolean>;
   logout: () => Promise<void>;
-  addRoutine: (routine: Omit<Routine, 'id'>) => void;
+  addRoutine: (routine: Omit<Routine, "id">) => void;
   updateRoutine: (id: string, routine: Partial<Routine>) => void;
   deleteRoutine: (id: string) => void;
   logWorkout: (routineId: string, date?: string) => void;
@@ -23,11 +29,11 @@ interface AppContextType {
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
 const STORAGE_KEYS = {
-  USER: '@gymtrack_user',
-  USERS_DB: '@gymtrack_users_db',
-  ROUTINES: '@gymtrack_routines',
-  LOGS: '@gymtrack_logs',
-  ONBOARDING: '@gymtrack_onboarding',
+  USER: "@gymtrack_user",
+  USERS_DB: "@gymtrack_users_db",
+  ROUTINES: "@gymtrack_routines",
+  LOGS: "@gymtrack_logs",
+  ONBOARDING: "@gymtrack_onboarding",
 };
 
 interface StoredUser {
@@ -51,12 +57,13 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   const loadData = async () => {
     try {
-      const [userData, routinesData, logsData, onboardingData] = await Promise.all([
-        AsyncStorage.getItem(STORAGE_KEYS.USER),
-        AsyncStorage.getItem(STORAGE_KEYS.ROUTINES),
-        AsyncStorage.getItem(STORAGE_KEYS.LOGS),
-        AsyncStorage.getItem(STORAGE_KEYS.ONBOARDING),
-      ]);
+      const [userData, routinesData, logsData, onboardingData] =
+        await Promise.all([
+          AsyncStorage.getItem(STORAGE_KEYS.USER),
+          AsyncStorage.getItem(STORAGE_KEYS.ROUTINES),
+          AsyncStorage.getItem(STORAGE_KEYS.LOGS),
+          AsyncStorage.getItem(STORAGE_KEYS.ONBOARDING),
+        ]);
 
       if (userData) {
         setUser(JSON.parse(userData));
@@ -67,11 +74,11 @@ export function AppProvider({ children }: { children: ReactNode }) {
       if (logsData) {
         setLogs(JSON.parse(logsData));
       }
-      if (onboardingData === 'true') {
+      if (onboardingData === "true") {
         setHasCompletedOnboarding(true);
       }
     } catch (error) {
-      console.error('Error loading data:', error);
+      console.error("Error loading data:", error);
     } finally {
       setIsLoading(false);
     }
@@ -86,16 +93,19 @@ export function AppProvider({ children }: { children: ReactNode }) {
       }
       setUser(userData);
     } catch (error) {
-      console.error('Error saving user:', error);
+      console.error("Error saving user:", error);
     }
   };
 
   const saveRoutines = async (routinesData: Routine[]) => {
     try {
-      await AsyncStorage.setItem(STORAGE_KEYS.ROUTINES, JSON.stringify(routinesData));
+      await AsyncStorage.setItem(
+        STORAGE_KEYS.ROUTINES,
+        JSON.stringify(routinesData),
+      );
       setRoutines(routinesData);
     } catch (error) {
-      console.error('Error saving routines:', error);
+      console.error("Error saving routines:", error);
     }
   };
 
@@ -104,7 +114,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       await AsyncStorage.setItem(STORAGE_KEYS.LOGS, JSON.stringify(logsData));
       setLogs(logsData);
     } catch (error) {
-      console.error('Error saving logs:', error);
+      console.error("Error saving logs:", error);
     }
   };
 
@@ -113,21 +123,21 @@ export function AppProvider({ children }: { children: ReactNode }) {
       // Obtener usuarios registrados
       const usersData = await AsyncStorage.getItem(STORAGE_KEYS.USERS_DB);
       const users: StoredUser[] = usersData ? JSON.parse(usersData) : [];
-      
+
       // Buscar usuario por email
       const foundUser = users.find(
-        (u) => u.email.toLowerCase() === email.toLowerCase()
+        (u) => u.email.toLowerCase() === email.toLowerCase(),
       );
-      
+
       if (!foundUser) {
-        throw new Error('Usuario no encontrado. ¿Ya te registraste?');
+        throw new Error("Usuario no encontrado. ¿Ya te registraste?");
       }
-      
+
       // Verificar contraseña
       if (foundUser.password !== password) {
-        throw new Error('Contraseña incorrecta');
+        throw new Error("Contraseña incorrecta");
       }
-      
+
       // Login exitoso - guardar sesión (sin password)
       const sessionUser: User = {
         id: foundUser.id,
@@ -141,21 +151,25 @@ export function AppProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const register = async (name: string, email: string, password: string): Promise<boolean> => {
+  const register = async (
+    name: string,
+    email: string,
+    password: string,
+  ): Promise<boolean> => {
     try {
       // Obtener usuarios existentes
       const usersData = await AsyncStorage.getItem(STORAGE_KEYS.USERS_DB);
       const users: StoredUser[] = usersData ? JSON.parse(usersData) : [];
-      
+
       // Verificar si el email ya existe
       const existingUser = users.find(
-        (u) => u.email.toLowerCase() === email.toLowerCase()
+        (u) => u.email.toLowerCase() === email.toLowerCase(),
       );
-      
+
       if (existingUser) {
-        throw new Error('Este correo ya está registrado');
+        throw new Error("Este correo ya está registrado");
       }
-      
+
       // Crear nuevo usuario
       const newUser: StoredUser = {
         id: Date.now().toString(),
@@ -163,11 +177,14 @@ export function AppProvider({ children }: { children: ReactNode }) {
         email: email.toLowerCase().trim(),
         password: password,
       };
-      
+
       // Guardar en "base de datos" local
       const updatedUsers = [...users, newUser];
-      await AsyncStorage.setItem(STORAGE_KEYS.USERS_DB, JSON.stringify(updatedUsers));
-      
+      await AsyncStorage.setItem(
+        STORAGE_KEYS.USERS_DB,
+        JSON.stringify(updatedUsers),
+      );
+
       // Iniciar sesión automáticamente
       const sessionUser: User = {
         id: newUser.id,
@@ -177,7 +194,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       await saveUser(sessionUser);
       return true;
     } catch (error) {
-      console.error('Register error:', error);
+      console.error("Register error:", error);
       throw error;
     }
   };
@@ -186,7 +203,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     await saveUser(null);
   };
 
-  const addRoutine = (routineData: Omit<Routine, 'id'>) => {
+  const addRoutine = (routineData: Omit<Routine, "id">) => {
     const newRoutine: Routine = {
       ...routineData,
       id: Date.now().toString(),
@@ -197,7 +214,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   const updateRoutine = (id: string, updates: Partial<Routine>) => {
     const updatedRoutines = routines.map((r) =>
-      r.id === id ? { ...r, ...updates } : r
+      r.id === id ? { ...r, ...updates } : r,
     );
     saveRoutines(updatedRoutines);
   };
@@ -210,16 +227,16 @@ export function AppProvider({ children }: { children: ReactNode }) {
   };
 
   const logWorkout = (routineId: string, date?: string) => {
-    const logDate = date || new Date().toISOString().split('T')[0];
+    const logDate = date || new Date().toISOString().split("T")[0];
     const existingLogIndex = logs.findIndex(
-      (l) => l.date === logDate && l.routineId === routineId
+      (l) => l.date === logDate && l.routineId === routineId,
     );
 
     let updatedLogs: DailyLog[];
     if (existingLogIndex >= 0) {
       // Update existing log
       updatedLogs = logs.map((l, index) =>
-        index === existingLogIndex ? { ...l, completed: !l.completed } : l
+        index === existingLogIndex ? { ...l, completed: !l.completed } : l,
       );
     } else {
       // Create new log
@@ -236,10 +253,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   const completeOnboarding = async () => {
     try {
-      await AsyncStorage.setItem(STORAGE_KEYS.ONBOARDING, 'true');
+      await AsyncStorage.setItem(STORAGE_KEYS.ONBOARDING, "true");
       setHasCompletedOnboarding(true);
     } catch (error) {
-      console.error('Error completing onboarding:', error);
+      console.error("Error completing onboarding:", error);
     }
   };
 
@@ -256,7 +273,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       setLogs([]);
       setHasCompletedOnboarding(false);
     } catch (error) {
-      console.error('Error clearing data:', error);
+      console.error("Error clearing data:", error);
     }
   };
 
@@ -288,8 +305,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
 export function useApp() {
   const context = useContext(AppContext);
   if (context === undefined) {
-    throw new Error('useApp must be used within an AppProvider');
+    throw new Error("useApp must be used within an AppProvider");
   }
   return context;
 }
-
