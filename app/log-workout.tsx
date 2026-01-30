@@ -89,7 +89,7 @@ export default function LogWorkoutScreen() {
             </View>
           ) : (
             <View style={styles.addBadge}>
-              <IconSymbol name="add" size={18} color={Colors.textMuted} />
+              <IconSymbol name="plus" size={18} color={Colors.textMuted} />
             </View>
           )}
         </View>

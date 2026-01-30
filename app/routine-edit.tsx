@@ -172,7 +172,7 @@ export default function RoutineEditScreen() {
                   style={styles.addExerciseButton}
                   onPress={handleAddExercise}
                 >
-                  <IconSymbol name="add" size={18} color={Colors.primary} />
+                  <IconSymbol name="plus" size={18} color={Colors.primary} />
                   <Text style={styles.addExerciseText}>Agregar</Text>
                 </TouchableOpacity>
               </View>
@@ -297,7 +297,7 @@ const styles = StyleSheet.create({
   },
   saveButtonText: {
     ...Typography.bodyMedium,
-    color: Colors.text,
+    color: Colors.textLight,
   },
   scrollView: {
     flex: 1,

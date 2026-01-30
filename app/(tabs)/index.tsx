@@ -153,7 +153,7 @@ export default function HomeScreen() {
             style={styles.gradientButton}
           >
             <Text style={styles.quickActionText}>
-              ✨ Registrar entrenamiento
+              Registrar entrenamiento
             </Text>
           </LinearGradient>
         </TouchableOpacity>

@@ -13,12 +13,13 @@ export const Colors = {
   // Text colors (dark for light theme)
   text: "#1E293B",
   textSecondary: "#475569",
-  textMuted: "#64748B",
+  textMuted: "#a0a0a0",
+  textLight: "#FFFFFF",
 
   // Premium accent colors with gradient-friendly pairs
-  primary: "#7C3AED", // Vibrant purple
+  primary: "#332D56", // Vibrant purple
   primaryLight: "#A78BFA",
-  primaryDark: "#6D28D9",
+  primaryDark: "#332D56",
 
   // Muscle category colors - elegant and vibrant
   muscle: {
@@ -39,7 +40,7 @@ export const Colors = {
     },
     shadowGlow: {
       elevation: 8,
-      shadowColor: "#7C3AED",
+      shadowColor: "#7C4585",
       shadowOffset: { width: 0, height: 4 },
       shadowOpacity: 0.2,
       shadowRadius: 12,
