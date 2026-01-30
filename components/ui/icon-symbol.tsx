@@ -43,7 +43,9 @@ const MAPPING = {
   "heart.fill": "favorite",
   gear: "settings",
   "clipboard.fill": "assignment",
-  "square.grid.2x2": "bar-chart"
+  "square.grid.2x2": "bar-chart",
+  "photo.fill": "photo-library",
+  "camera.fill": "photo-camera",
 } as unknown as IconMapping;
 
 /**

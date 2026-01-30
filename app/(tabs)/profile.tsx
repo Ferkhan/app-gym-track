@@ -1,13 +1,16 @@
+import * as ImagePicker from "expo-image-picker";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
-    Alert,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  Alert,
+  Image,
+  Modal,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -15,11 +18,113 @@ import { IconSymbol } from "@/components/ui/icon-symbol";
 import { Colors, Spacing, Typography } from "@/constants/theme";
 import { useApp } from "@/context/AppContext";
 
+// Avatares predefinidos
+const PREDEFINED_AVATARS = [
+  { id: "avatar_1", emoji: "💪" },
+  { id: "avatar_2", emoji: "🏋️" },
+  { id: "avatar_3", emoji: "🏃" },
+  { id: "avatar_4", emoji: "⚡" },
+  { id: "avatar_5", emoji: "🔥" },
+  { id: "avatar_6", emoji: "🌟" },
+  { id: "avatar_7", emoji: "🎯" },
+  { id: "avatar_8", emoji: "🏆" },
+  { id: "avatar_9", emoji: "👤" },
+  { id: "avatar_10", emoji: "🦁" },
+  { id: "avatar_11", emoji: "🐺" },
+  { id: "avatar_12", emoji: "🦅" },
+];
+
 export default function ProfileScreen() {
   const router = useRouter();
   const { user, setUser, logout, clearAllData } = useApp();
   const [editingName, setEditingName] = useState(false);
   const [name, setName] = useState(user?.name || "");
+  const [showAvatarModal, setShowAvatarModal] = useState(false);
+
+  // Obtener el avatar actual
+  const getCurrentAvatar = () => {
+    if (!user?.avatar) return null;
+
+    // Si es un avatar predefinido (emoji)
+    const predefined = PREDEFINED_AVATARS.find((a) => a.id === user.avatar);
+    if (predefined) return { type: "emoji" as const, value: predefined.emoji };
+
+    // Si es una URL de imagen
+    if (user.avatar.startsWith("file://") || user.avatar.startsWith("http")) {
+      return { type: "image" as const, value: user.avatar };
+    }
+
+    return null;
+  };
+
+  const currentAvatar = getCurrentAvatar();
+
+  const handleSelectPredefinedAvatar = (avatarId: string) => {
+    if (user) {
+      setUser({ ...user, avatar: avatarId });
+    }
+    setShowAvatarModal(false);
+  };
+
+  const handlePickImage = async () => {
+    // Solicitar permisos
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+    if (status !== "granted") {
+      Alert.alert(
+        "Permiso requerido",
+        "Necesitamos acceso a tu galería para seleccionar una foto",
+      );
+      return;
+    }
+
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ["images"],
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 0.8,
+    });
+
+    if (!result.canceled && result.assets[0]) {
+      if (user) {
+        setUser({ ...user, avatar: result.assets[0].uri });
+      }
+      setShowAvatarModal(false);
+    }
+  };
+
+  const handleTakePhoto = async () => {
+    // Solicitar permisos de cámara
+    const { status } = await ImagePicker.requestCameraPermissionsAsync();
+
+    if (status !== "granted") {
+      Alert.alert(
+        "Permiso requerido",
+        "Necesitamos acceso a tu cámara para tomar una foto",
+      );
+      return;
+    }
+
+    const result = await ImagePicker.launchCameraAsync({
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 0.8,
+    });
+
+    if (!result.canceled && result.assets[0]) {
+      if (user) {
+        setUser({ ...user, avatar: result.assets[0].uri });
+      }
+      setShowAvatarModal(false);
+    }
+  };
+
+  const handleRemoveAvatar = () => {
+    if (user) {
+      setUser({ ...user, avatar: undefined });
+    }
+    setShowAvatarModal(false);
+  };
 
   const handleSaveName = () => {
     if (!name.trim()) {
@@ -79,11 +184,29 @@ export default function ProfileScreen() {
 
         {/* Avatar Section */}
         <View style={styles.avatarSection}>
-          <View style={styles.avatarContainer}>
-            <Text style={styles.avatarText}>
-              {(user?.name || "U").charAt(0).toUpperCase()}
-            </Text>
-          </View>
+          <TouchableOpacity
+            style={styles.avatarWrapper}
+            onPress={() => setShowAvatarModal(true)}
+            activeOpacity={0.8}
+          >
+            <View style={styles.avatarContainer}>
+              {currentAvatar?.type === "image" ? (
+                <Image
+                  source={{ uri: currentAvatar.value }}
+                  style={styles.avatarImage}
+                />
+              ) : currentAvatar?.type === "emoji" ? (
+                <Text style={styles.avatarEmoji}>{currentAvatar.value}</Text>
+              ) : (
+                <Text style={styles.avatarText}>
+                  {(user?.name || "U").charAt(0).toUpperCase()}
+                </Text>
+              )}
+            </View>
+            <View style={styles.avatarEditBadge}>
+              <IconSymbol name="pencil" size={14} color="#FFFFFF" />
+            </View>
+          </TouchableOpacity>
           <Text style={styles.userName}>{user?.name || "Usuario"}</Text>
           <Text style={styles.userEmail}>{user?.email || "Sin correo"}</Text>
         </View>
@@ -204,6 +327,87 @@ export default function ProfileScreen() {
           <Text style={styles.footerSubtext}>Hecho para los ganadores</Text>
         </View>
       </ScrollView>
+
+      {/* Modal de selección de avatar */}
+      <Modal
+        visible={showAvatarModal}
+        animationType="slide"
+        transparent={true}
+        onRequestClose={() => setShowAvatarModal(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Cambiar foto de perfil</Text>
+              <TouchableOpacity
+                onPress={() => setShowAvatarModal(false)}
+                style={styles.modalCloseButton}
+              >
+                <IconSymbol name="xmark" size={20} color={Colors.text} />
+              </TouchableOpacity>
+            </View>
+
+            {/* Opciones de foto */}
+            <View style={styles.photoOptions}>
+              <TouchableOpacity
+                style={styles.photoOptionButton}
+                onPress={handlePickImage}
+              >
+                <View style={styles.photoOptionIcon}>
+                  <IconSymbol
+                    name="photo.fill"
+                    size={24}
+                    color={Colors.primary}
+                  />
+                </View>
+                <Text style={styles.photoOptionText}>Galería</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={styles.photoOptionButton}
+                onPress={handleTakePhoto}
+              >
+                <View style={styles.photoOptionIcon}>
+                  <IconSymbol
+                    name="camera.fill"
+                    size={24}
+                    color={Colors.primary}
+                  />
+                </View>
+                <Text style={styles.photoOptionText}>Cámara</Text>
+              </TouchableOpacity>
+            </View>
+
+            {/* Avatares predefinidos */}
+            <Text style={styles.avatarSectionTitle}>O elige un avatar</Text>
+            <View style={styles.avatarGrid}>
+              {PREDEFINED_AVATARS.map((avatar) => (
+                <TouchableOpacity
+                  key={avatar.id}
+                  style={[
+                    styles.avatarOption,
+                    user?.avatar === avatar.id && styles.avatarOptionSelected,
+                  ]}
+                  onPress={() => handleSelectPredefinedAvatar(avatar.id)}
+                >
+                  <Text style={styles.avatarOptionEmoji}>{avatar.emoji}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+
+            {/* Botón para eliminar avatar */}
+            {user?.avatar && (
+              <TouchableOpacity
+                style={styles.removeAvatarButton}
+                onPress={handleRemoveAvatar}
+              >
+                <IconSymbol name="trash.fill" size={16} color={Colors.error} />
+                <Text style={styles.removeAvatarText}>Eliminar foto</Text>
+              </TouchableOpacity>
+            )}
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 }
@@ -229,20 +433,45 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingVertical: Spacing.lg,
   },
+  avatarWrapper: {
+    position: "relative",
+    marginBottom: Spacing.md,
+  },
   avatarContainer: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
+    width: 100,
+    height: 100,
+    borderRadius: 50,
     backgroundColor: Colors.primary,
     justifyContent: "center",
     alignItems: "center",
-    marginBottom: Spacing.md,
     ...Colors.ui.shadowGlow,
+    overflow: "hidden",
+  },
+  avatarImage: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+  },
+  avatarEmoji: {
+    fontSize: 48,
   },
   avatarText: {
-    fontSize: 32,
+    fontSize: 40,
     fontWeight: "700",
     color: "#FFFFFF",
+  },
+  avatarEditBadge: {
+    position: "absolute",
+    bottom: 0,
+    right: 0,
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: Colors.primary,
+    justifyContent: "center",
+    alignItems: "center",
+    borderWidth: 2,
+    borderColor: Colors.background,
   },
   userName: {
     ...Typography.h2,
@@ -400,5 +629,100 @@ const styles = StyleSheet.create({
     ...Typography.small,
     color: Colors.textMuted,
     marginTop: Spacing.xs,
+  },
+  // Modal styles
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    justifyContent: "flex-end",
+  },
+  modalContent: {
+    backgroundColor: Colors.backgroundCard,
+    borderTopLeftRadius: Colors.ui.borderRadiusXL,
+    borderTopRightRadius: Colors.ui.borderRadiusXL,
+    padding: Spacing.lg,
+    paddingBottom: Spacing.xxl,
+    maxHeight: "80%",
+  },
+  modalHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: Spacing.lg,
+  },
+  modalTitle: {
+    ...Typography.h2,
+    color: Colors.text,
+  },
+  modalCloseButton: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: Colors.backgroundElevated,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  photoOptions: {
+    flexDirection: "row",
+    justifyContent: "center",
+    gap: Spacing.xl,
+    marginBottom: Spacing.xl,
+  },
+  photoOptionButton: {
+    alignItems: "center",
+  },
+  photoOptionIcon: {
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    backgroundColor: Colors.primary + "15",
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: Spacing.sm,
+  },
+  photoOptionText: {
+    ...Typography.caption,
+    color: Colors.text,
+  },
+  avatarSectionTitle: {
+    ...Typography.captionMedium,
+    color: Colors.textSecondary,
+    textAlign: "center",
+    marginBottom: Spacing.md,
+  },
+  avatarGrid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "center",
+    gap: Spacing.sm,
+    marginBottom: Spacing.lg,
+  },
+  avatarOption: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: Colors.backgroundElevated,
+    justifyContent: "center",
+    alignItems: "center",
+    borderWidth: 2,
+    borderColor: "transparent",
+  },
+  avatarOptionSelected: {
+    borderColor: Colors.primary,
+    backgroundColor: Colors.primary + "15",
+  },
+  avatarOptionEmoji: {
+    fontSize: 28,
+  },
+  removeAvatarButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: Spacing.sm,
+    paddingVertical: Spacing.md,
+  },
+  removeAvatarText: {
+    ...Typography.body,
+    color: Colors.error,
   },
 });

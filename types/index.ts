@@ -1,4 +1,4 @@
-export type RoutineCategory = 'Legs' | 'Back' | 'Chest' | 'Arms';
+export type RoutineCategory = "Legs" | "Back" | "Chest" | "Arms";
 
 export interface Exercise {
   id: string;
@@ -25,5 +25,5 @@ export interface User {
   id: string;
   name: string;
   email?: string;
+  avatar?: string; // URL de imagen o ID de avatar predefinido
 }
-

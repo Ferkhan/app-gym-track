@@ -2,17 +2,18 @@ import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 import React, { useRef, useState } from "react";
 import {
-    Dimensions,
-    NativeScrollEvent,
-    NativeSyntheticEvent,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  Dimensions,
+  NativeScrollEvent,
+  NativeSyntheticEvent,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+import { IconSymbol } from "@/components/ui/icon-symbol";
 import { Colors, Spacing, Typography } from "@/constants/theme";
 import { useApp } from "@/context/AppContext";
 
@@ -24,7 +25,7 @@ const slides = [
     title: "Bienvenido a GymTrack",
     description:
       "Lleva un registro completo de tus rutinas y progreso en el gimnasio de manera sencilla y organizada.",
-    icon: "💪",
+    icon: "dumbbell.fill" as const,
     color: Colors.primary,
   },
   {
@@ -32,7 +33,7 @@ const slides = [
     title: "Organiza tus Rutinas",
     description:
       "Crea y gestiona hasta 5 rutinas personalizadas con ejercicios, series y repeticiones.",
-    icon: "📋",
+    icon: "clipboard.fill" as const,
     color: Colors.muscle.Back,
   },
   {
@@ -40,7 +41,7 @@ const slides = [
     title: "Visualiza tu Progreso",
     description:
       "Lleva un seguimiento diario de tus entrenamientos y observa tu evolución en el calendario.",
-    icon: "📊",
+    icon: "square.grid.2x2" as const,
     color: Colors.muscle.Arms,
   },
 ];
@@ -101,7 +102,7 @@ export default function OnboardingScreen() {
                 { backgroundColor: slide.color + "15" },
               ]}
             >
-            <Text style={styles.icon}>{slide.icon}</Text>
+              <IconSymbol name={slide.icon} size={64} color={slide.color} />
             </View>
             <Text style={styles.title}>{slide.title}</Text>
             <Text style={styles.description}>{slide.description}</Text>
@@ -134,7 +135,7 @@ export default function OnboardingScreen() {
             style={styles.buttonGradient}
           >
             <Text style={styles.buttonText}>
-              {currentPage === slides.length - 1 ? "🚀 Comenzar" : "Siguiente"}
+              {currentPage === slides.length - 1 ? "Comenzar" : "Siguiente"}
             </Text>
           </LinearGradient>
         </TouchableOpacity>
