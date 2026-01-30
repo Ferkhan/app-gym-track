@@ -40,7 +40,7 @@ export const Colors = {
     },
     shadowGlow: {
       elevation: 8,
-      shadowColor: "#7C4585",
+      shadowColor: "#854545",
       shadowOffset: { width: 0, height: 4 },
       shadowOpacity: 0.2,
       shadowRadius: 12,
