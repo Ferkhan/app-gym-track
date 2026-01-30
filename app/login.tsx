@@ -30,14 +30,21 @@ export default function LoginScreen() {
       return;
     }
 
+    // Validar formato de email
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email.trim())) {
+      Alert.alert("Error", "Por favor ingresa un correo válido");
+      return;
+    }
+
     setLoading(true);
     try {
-      const success = await login(email, password);
+      const success = await login(email.trim(), password);
       if (success) {
         router.replace("/(tabs)");
       }
-    } catch (error) {
-      Alert.alert("Error", "No se pudo iniciar sesión");
+    } catch (error: any) {
+      Alert.alert("Error", error.message || "No se pudo iniciar sesión");
     } finally {
       setLoading(false);
     }

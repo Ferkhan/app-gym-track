@@ -24,10 +24,18 @@ const AppContext = createContext<AppContextType | undefined>(undefined);
 
 const STORAGE_KEYS = {
   USER: '@gymtrack_user',
+  USERS_DB: '@gymtrack_users_db',
   ROUTINES: '@gymtrack_routines',
   LOGS: '@gymtrack_logs',
   ONBOARDING: '@gymtrack_onboarding',
 };
+
+interface StoredUser {
+  id: string;
+  name: string;
+  email: string;
+  password: string;
+}
 
 export function AppProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
@@ -101,25 +109,77 @@ export function AppProvider({ children }: { children: ReactNode }) {
   };
 
   const login = async (email: string, password: string): Promise<boolean> => {
-    // Mock authentication - in a real app, this would call an API
-    const mockUser: User = {
-      id: '1',
-      name: email.split('@')[0],
-      email,
-    };
-    await saveUser(mockUser);
-    return true;
+    try {
+      // Obtener usuarios registrados
+      const usersData = await AsyncStorage.getItem(STORAGE_KEYS.USERS_DB);
+      const users: StoredUser[] = usersData ? JSON.parse(usersData) : [];
+      
+      // Buscar usuario por email
+      const foundUser = users.find(
+        (u) => u.email.toLowerCase() === email.toLowerCase()
+      );
+      
+      if (!foundUser) {
+        throw new Error('Usuario no encontrado. ¿Ya te registraste?');
+      }
+      
+      // Verificar contraseña
+      if (foundUser.password !== password) {
+        throw new Error('Contraseña incorrecta');
+      }
+      
+      // Login exitoso - guardar sesión (sin password)
+      const sessionUser: User = {
+        id: foundUser.id,
+        name: foundUser.name,
+        email: foundUser.email,
+      };
+      await saveUser(sessionUser);
+      return true;
+    } catch (error) {
+      throw error;
+    }
   };
 
   const register = async (name: string, email: string, password: string): Promise<boolean> => {
-    // Mock registration
-    const newUser: User = {
-      id: Date.now().toString(),
-      name,
-      email,
-    };
-    await saveUser(newUser);
-    return true;
+    try {
+      // Obtener usuarios existentes
+      const usersData = await AsyncStorage.getItem(STORAGE_KEYS.USERS_DB);
+      const users: StoredUser[] = usersData ? JSON.parse(usersData) : [];
+      
+      // Verificar si el email ya existe
+      const existingUser = users.find(
+        (u) => u.email.toLowerCase() === email.toLowerCase()
+      );
+      
+      if (existingUser) {
+        throw new Error('Este correo ya está registrado');
+      }
+      
+      // Crear nuevo usuario
+      const newUser: StoredUser = {
+        id: Date.now().toString(),
+        name: name.trim(),
+        email: email.toLowerCase().trim(),
+        password: password,
+      };
+      
+      // Guardar en "base de datos" local
+      const updatedUsers = [...users, newUser];
+      await AsyncStorage.setItem(STORAGE_KEYS.USERS_DB, JSON.stringify(updatedUsers));
+      
+      // Iniciar sesión automáticamente
+      const sessionUser: User = {
+        id: newUser.id,
+        name: newUser.name,
+        email: newUser.email,
+      };
+      await saveUser(sessionUser);
+      return true;
+    } catch (error) {
+      console.error('Register error:', error);
+      throw error;
+    }
   };
 
   const logout = async () => {

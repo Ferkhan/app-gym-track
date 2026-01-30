@@ -31,6 +31,13 @@ export default function RegisterScreen() {
       return;
     }
 
+    // Validar formato de email
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email.trim())) {
+      Alert.alert("Error", "Por favor ingresa un correo válido");
+      return;
+    }
+
     if (password.length < 6) {
       Alert.alert("Error", "La contraseña debe tener al menos 6 caracteres");
       return;
@@ -38,12 +45,16 @@ export default function RegisterScreen() {
 
     setLoading(true);
     try {
-      const success = await register(name, email, password);
+      const success = await register(name.trim(), email.trim(), password);
       if (success) {
-        router.replace("/(tabs)");
+        Alert.alert(
+          "¡Bienvenido!",
+          "Tu cuenta ha sido creada exitosamente",
+          [{ text: "OK", onPress: () => router.replace("/(tabs)") }]
+        );
       }
-    } catch (error) {
-      Alert.alert("Error", "No se pudo crear la cuenta");
+    } catch (error: any) {
+      Alert.alert("Error", error.message || "No se pudo crear la cuenta");
     } finally {
       setLoading(false);
     }
